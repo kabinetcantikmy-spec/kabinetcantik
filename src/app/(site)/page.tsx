@@ -1,0 +1,156 @@
+import Link from "next/link";
+import Hero from "@/components/Hero";
+import CategoryTiles from "@/components/CategoryTiles";
+import ProjectCard from "@/components/ProjectCard";
+import BeforeAfter from "@/components/BeforeAfter";
+import { getFeaturedProjects } from "@/lib/portfolioDb";
+import { createServiceClient, supabaseReady } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
+
+const STEPS = [
+  { n: "01", t: "Enquiry", d: "Isi sebut harga atau WhatsApp kami. Dapat anggaran serta-merta." },
+  { n: "02", t: "Ukur Tapak", d: "Kami datang ukur & bincang reka bentuk di rumah anda." },
+  { n: "03", t: "Reka & Sebut Harga", d: "Design + sebut harga tepat mengikut ukuran & bahan." },
+  { n: "04", t: "Fabrikasi & Pasang", d: "Dibuat di workshop kami, dipasang kemas & tepat masa." },
+];
+
+const MATERIALS = ["Laminat E0", "Acrylic", "4G / 5G Glass", "Sintered Stone", "Veneer", "Quartz", "Fluted Panel", "Aluminium"];
+
+const TESTIMONIALS = [
+  { name: "Puan Aina", area: "Damansara", text: "Kabinet dapur kami nampak mewah tapi harga berpatutan. Pemasangan kemas & tepat masa." },
+  { name: "Encik Faiz", area: "Shah Alam", text: "Dari design sampai siap semua smooth. Wardrobe walk-in memang jadi macam gambar." },
+  { name: "Puan Mei", area: "Mont Kiara", text: "Team responsive di WhatsApp, quotation pun jelas. Recommended!" },
+];
+
+interface HomeReview { nama: string; rating: number; ulasan: string | null }
+
+export default async function HomePage() {
+  const featured = (await getFeaturedProjects()).slice(0, 6);
+
+  let testimonials: { name: string; text: string; rating: number; area?: string }[] = TESTIMONIALS.map((t) => ({
+    name: t.name,
+    text: t.text,
+    rating: 5,
+    area: t.area,
+  }));
+  if (supabaseReady()) {
+    const sb = createServiceClient();
+    const { data } = await sb.from("reviews").select("nama, rating, ulasan").eq("diterbitkan", true).order("created_at", { ascending: false }).limit(3);
+    const rows = (data || []) as HomeReview[];
+    if (rows.length) {
+      testimonials = rows.map((r) => ({ name: r.nama, text: r.ulasan || "", rating: r.rating }));
+    }
+  }
+
+  return (
+    <>
+      <Hero />
+      <CategoryTiles />
+
+      {/* Featured portfolio */}
+      <section className="container-c py-8">
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="eyebrow">Portfolio</p>
+            <h2 className="mt-2 h-display text-3xl">Projek pilihan</h2>
+          </div>
+          <Link href="/portfolio" className="hidden text-sm font-semibold text-brass hover:underline sm:block">
+            Lihat Semua →
+          </Link>
+        </div>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((p) => <ProjectCard key={p.slug} p={p} />)}
+        </div>
+        <div className="mt-6 sm:hidden">
+          <Link href="/portfolio" className="text-sm font-semibold text-brass">Lihat Semua →</Link>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="mt-12 bg-ink py-20 text-off-white">
+        <div className="container-c">
+          <p className="eyebrow text-brass-lite">Prosesnya mudah</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-tan">Cara ia berfungsi</h2>
+          <div className="mt-10 grid gap-8 md:grid-cols-4">
+            {STEPS.map((s) => (
+              <div key={s.n}>
+                <div className="font-serif text-4xl italic text-brass">{s.n}</div>
+                <h3 className="mt-2 font-display text-lg font-semibold text-off-white">{s.t}</h3>
+                <p className="mt-2 text-sm text-white/65">{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Materials */}
+      <section id="bahan" className="container-c py-20">
+        <p className="eyebrow">Bahan & Kemasan</p>
+        <h2 className="mt-2 h-display text-3xl">Kualiti & pilihan tanpa kompromi</h2>
+        <div className="mt-8 flex flex-wrap gap-3">
+          {MATERIALS.map((m) => (
+            <span key={m} className="rounded-full border border-ink/15 bg-white px-5 py-2.5 text-sm text-ink/80">
+              {m}
+            </span>
+          ))}
+        </div>
+        <Link href="/bahan" className="mt-6 inline-block text-sm font-semibold text-brass hover:underline">Lihat semua bahan & swatch →</Link>
+      </section>
+
+      {/* Before / after */}
+      <section className="container-c py-8">
+        <p className="eyebrow">Transformasi</p>
+        <h2 className="mt-2 h-display text-3xl">Sebelum & selepas</h2>
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <BeforeAfter
+            before="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&q=80"
+            after="https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&q=80"
+            alt="Dapur"
+          />
+          <div className="flex flex-col justify-center">
+            <p className="font-serif text-xl leading-relaxed text-ink/75">
+              Kami ubah ruang lama jadi dapur yang kemas & moden — tarik slider untuk lihat perbezaannya.
+            </p>
+            <Link href="/portfolio" className="mt-4 text-sm font-semibold text-brass hover:underline">Lihat lebih banyak transformasi →</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Social proof */}
+      <section className="bg-white py-20">
+        <div className="container-c">
+          <p className="eyebrow">Ulasan Pelanggan</p>
+          <h2 className="mt-2 h-display text-3xl">Dipercayai keluarga Klang Valley</h2>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {testimonials.map((t, i) => (
+              <figure key={i} className="rounded-xl border border-ink/10 bg-paper p-6">
+                <div className="text-brass">{"★".repeat(t.rating)}</div>
+                <blockquote className="mt-3 font-serif text-lg italic text-ink/85">“{t.text}”</blockquote>
+                <figcaption className="mt-4 text-sm font-semibold text-ink">
+                  {t.name}
+                  {t.area ? <span className="font-normal text-ink/50"> · {t.area}</span> : null}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA band */}
+      <section className="bg-brass">
+        <div className="container-c flex flex-col items-center gap-6 py-16 text-center">
+          <h2 className="max-w-2xl font-display text-3xl font-semibold text-ink">
+            Dapatkan anggaran harga dalam 2 minit
+          </h2>
+          <p className="max-w-lg text-ink/75">
+            Jawab beberapa soalan ringkas, terus dapat julat harga & jadualkan ukur tapak percuma.
+          </p>
+          <Link href="/sebut-harga" className="rounded-lg bg-ink px-8 py-4 font-semibold text-off-white transition hover:bg-ink-soft">
+            Mula Sebut Harga →
+          </Link>
+        </div>
+      </section>
+    </>
+  );
+}

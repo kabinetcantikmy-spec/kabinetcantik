@@ -1,0 +1,11 @@
+node_modules
+.next
+.open-next
+out
+.env
+.env.local
+.dev.vars
+.DS_Store
+*.log
+.vercel
+.wrangler

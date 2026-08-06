@@ -1,0 +1,13 @@
+name = "kabinetcantik"
+main = ".open-next/worker.js"
+compatibility_date = "2024-12-30"
+compatibility_flags = ["nodejs_compat"]
+
+# Aset statik (dihasilkan oleh opennextjs-cloudflare build)
+assets = { directory = ".open-next/assets", binding = "ASSETS" }
+
+# Secrets diset di Cloudflare (bukan di sini): jalankan `wrangler secret put <NAME>`
+# atau set dalam dashboard Workers & Pages → Settings → Variables.
+# Public vars (NEXT_PUBLIC_*) boleh diletak dalam [vars] jika mahu.
+# [vars]
+# NEXT_PUBLIC_SERVICE_AREA = "Klang Valley"
