@@ -78,3 +78,24 @@ export async function saveBranding(input: { nama: string; logoUrl: string }): Pr
   revalidatePath("/", "layout");
   return { ok: true };
 }
+
+export async function uploadBrandingLogo(formData: FormData): Promise<{ ok: boolean; url?: string; error?: string }> {
+  const staff = await requireStaff();
+  if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
+  if (!staff.orgId) return { ok: false, error: "Tiada org untuk akaun ini." };
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) return { ok: false, error: "Tiada fail dipilih." };
+  if (file.size > 3 * 1024 * 1024) return { ok: false, error: "Saiz logo maksimum 3MB." };
+  const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
+  const path = `branding/${staff.orgId}/logo-${Date.now()}.${ext}`;
+  // Service-role — pintas storage RLS (admin authenticated tak diblok).
+  const sb = createServiceClient();
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const { error } = await sb.storage.from("lead-photos").upload(path, bytes, {
+    contentType: file.type || "image/png",
+    upsert: true,
+  });
+  if (error) return { ok: false, error: error.message };
+  const { data } = sb.storage.from("lead-photos").getPublicUrl(path);
+  return { ok: true, url: data?.publicUrl };
+}

@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-import { createSupabaseBrowser } from "@/lib/supabaseBrowser";
-import { saveBranding } from "@/app/admin/(panel)/tetapan/actions";
+import { saveBranding, uploadBrandingLogo } from "@/app/admin/(panel)/tetapan/actions";
 
 export default function BrandingEditor({
   initial,
@@ -22,15 +21,13 @@ export default function BrandingEditor({
     setUploading(true);
     setMsg(null);
     try {
-      const sb = createSupabaseBrowser();
-      const ext = (f.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "");
-      const path = `branding/${orgId}/logo-${Date.now()}.${ext}`;
-      const { error } = await sb.storage.from("lead-photos").upload(path, f, { upsert: true });
-      if (error) throw error;
-      const { data: pub } = sb.storage.from("lead-photos").getPublicUrl(path);
-      if (pub?.publicUrl) setLogoUrl(pub.publicUrl);
-    } catch {
-      setMsg({ ok: false, text: "Muat naik logo gagal. Cuba imej lain (PNG/JPG)." });
+      const fd = new FormData();
+      fd.append("file", f);
+      const res = await uploadBrandingLogo(fd);
+      if (!res.ok || !res.url) throw new Error(res.error || "gagal");
+      setLogoUrl(res.url);
+    } catch (err) {
+      setMsg({ ok: false, text: err instanceof Error ? err.message : "Muat naik logo gagal. Cuba imej lain (PNG/JPG)." });
     } finally {
       setUploading(false);
     }
@@ -53,7 +50,7 @@ export default function BrandingEditor({
   const label = "text-xs font-medium text-ink/60";
 
   return (
-    <div className="rounded-xl border border-ink/10 bg-white p-5">
+    <div className="rounded-xl border border-ink/10 bg-white p-5" data-org={orgId}>
       <h2 className="font-display text-lg font-semibold">Jenama (Logo & Nama)</h2>
       <p className="mt-1 text-sm text-ink/50">Logo & nama syarikat yang dipapar di laman, panel & emel.</p>
 
