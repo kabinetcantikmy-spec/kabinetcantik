@@ -25,7 +25,8 @@ export default function BookVisitForm() {
 
   function submit() {
     setErr("");
-    if (!nama.trim() || !telefon.trim() || !tarikh) { setErr("Sila isi nama, telefon & tarikh."); return; }
+    if (!nama.trim() || !telefon.trim() || !emel.trim() || !tarikh) { setErr("Sila isi nama, telefon, emel & tarikh."); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emel.trim())) { setErr("Sila masukkan emel yang sah."); return; }
     startTransition(async () => {
       const r = await bookSiteVisit({ nama, telefon, emel, tarikh, masa, alamat });
       if (r.ok) setDone(true);
@@ -38,7 +39,8 @@ export default function BookVisitForm() {
       <div className="space-y-3">
         <input value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Nama penuh *" className="w-full rounded-lg border border-ink/15 bg-paper px-4 py-3" />
         <input value={telefon} onChange={(e) => setTelefon(e.target.value)} placeholder="Nombor telefon (WhatsApp) *" className="w-full rounded-lg border border-ink/15 bg-paper px-4 py-3" />
-        <input value={emel} onChange={(e) => setEmel(e.target.value)} placeholder="Emel (pilihan)" className="w-full rounded-lg border border-ink/15 bg-paper px-4 py-3" />
+        <input type="email" required value={emel} onChange={(e) => setEmel(e.target.value)} placeholder="Emel *" className="w-full rounded-lg border border-ink/15 bg-paper px-4 py-3" />
+        <p className="text-xs text-ink/45">Pengesahan & kemas kini projek akan dihantar ke emel ini.</p>
         <div className="grid grid-cols-2 gap-3">
           <label className="text-sm text-ink/60">Tarikh pilihan
             <input type="date" value={tarikh} onChange={(e) => setTarikh(e.target.value)} className="mt-1 w-full rounded-lg border border-ink/15 bg-paper px-3 py-2.5" />

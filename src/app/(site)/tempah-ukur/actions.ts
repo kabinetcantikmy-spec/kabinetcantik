@@ -16,8 +16,12 @@ export async function bookSiteVisit(input: {
   alamat?: string;
 }): Promise<Res> {
   if (!supabaseReady()) return { ok: false, error: "Sistem tidak tersedia." };
+  const emel = (input.emel || "").trim();
   if (!input.nama.trim() || !input.telefon.trim() || !input.tarikh) {
     return { ok: false, error: "Nama, telefon & tarikh wajib." };
+  }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emel)) {
+    return { ok: false, error: "Emel yang sah wajib." };
   }
   const sb = createServiceClient();
   const orgId = await resolveOrgId((await headers()).get("host"));
@@ -29,7 +33,7 @@ export async function bookSiteVisit(input: {
       org_id: orgId,
       nama: input.nama.trim(),
       telefon: input.telefon.trim(),
-      emel: input.emel?.trim() || null,
+      emel: emel || null,
       source: "tempah_ukur",
       stage: "Ukur Tapak",
     })
@@ -46,7 +50,7 @@ export async function bookSiteVisit(input: {
     catatan: input.alamat || null,
   });
 
-  if (input.emel) {
+  if (emel) {
     await sendEmail({
       to: input.emel,
       fromName: brand.nama,
