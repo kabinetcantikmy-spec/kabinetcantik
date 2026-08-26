@@ -6,6 +6,7 @@ import { fmtDate } from "@/lib/format";
 import Logo from "@/components/Logo";
 import AcceptQuote from "@/components/AcceptQuote";
 import { tenantBrand } from "@/lib/branding";
+import { planForOrg } from "@/lib/planServer";
 import { markQuoteViewed } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,7 @@ export default async function PublicQuote(props: { params: Promise<{ token: stri
   if (!quote) notFound();
   const q = quote as Quotation & { leads?: { nama: string; telefon: string } | null };
   const brand = await tenantBrand((quote as { org_id?: string }).org_id);
+  const { features } = await planForOrg((quote as { org_id?: string }).org_id);
 
   await markQuoteViewed(params.token);
 
@@ -83,6 +85,9 @@ export default async function PublicQuote(props: { params: Promise<{ token: stri
           <AcceptQuote token={params.token} accepted={q.status === "accepted"} />
           <p className="mt-3 text-center text-xs text-ink/40">Harga sah 30 hari. Deposit {q.deposit_pct}% diperlukan untuk memulakan fabrikasi.</p>
         </div>
+        {features.quoteWatermark && (
+          <p className="mt-4 border-t border-ink/10 pt-3 text-center text-[11px] text-ink/30">Dijana dengan KabinetCantik OS</p>
+        )}
       </div>
     </section>
   );

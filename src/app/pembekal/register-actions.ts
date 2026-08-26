@@ -3,6 +3,7 @@ import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { sendEmail, emailShell } from "@/lib/email";
 import { resolveOrgId } from "@/lib/tenant";
 import { tenantBrand } from "@/lib/branding";
+import { planForOrg } from "@/lib/planServer";
 import { headers } from "next/headers";
 
 type Res = { ok: boolean; error?: string };
@@ -27,6 +28,8 @@ export async function registerSupplier(input: {
   const sb = createServiceClient();
   const orgId = await resolveOrgId((await headers()).get("host"));
   const brand = await tenantBrand(orgId);
+  const { features } = await planForOrg(orgId);
+  if (!features.suppliers) return { ok: false, error: "Pendaftaran pembekal tidak tersedia untuk laman ini." };
 
   // 1) Cipta akaun auth
   const { data: created, error: authErr } = await sb.auth.admin.createUser({

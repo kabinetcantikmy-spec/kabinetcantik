@@ -7,6 +7,7 @@ import { fmtDate } from "@/lib/format";
 import Logo from "@/components/Logo";
 import PrintButton from "@/components/admin/PrintButton";
 import { tenantBrand } from "@/lib/branding";
+import { planForOrg } from "@/lib/planServer";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ export default async function QuotePrint(props: { params: Promise<{ id: string }
   const deposit = (q.jumlah * q.deposit_pct) / 100;
   const area = process.env.NEXT_PUBLIC_SERVICE_AREA || "Klang Valley";
   const brand = await tenantBrand((quote as { org_id?: string }).org_id);
+  const { features } = await planForOrg((quote as { org_id?: string }).org_id);
 
   return (
     <div className="mx-auto max-w-3xl bg-white p-8 text-ink print:p-0">
@@ -104,6 +106,9 @@ export default async function QuotePrint(props: { params: Promise<{ id: string }
         Harga adalah anggaran berdasarkan maklumat semasa; harga muktamad selepas ukur tapak. Sebut harga ini sah selama 30 hari.
         Deposit {q.deposit_pct}% diperlukan untuk memulakan fabrikasi.
       </div>
+      {features.quoteWatermark && (
+        <div className="mt-4 text-center text-[11px] text-ink/30">Dijana dengan KabinetCantik OS</div>
+      )}
     </div>
   );
 }

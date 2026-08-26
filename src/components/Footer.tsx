@@ -6,11 +6,15 @@ export default function Footer({
   area = "Klang Valley",
   address = "",
   tagline = "Built to Fit. Styled to Last.",
+  showPoweredBy = false,
+  suppliers = false,
 }: {
   brand?: { nama: string; logoUrl: string };
   area?: string;
   address?: string;
   tagline?: string;
+  showPoweredBy?: boolean;
+  suppliers?: boolean;
 }) {
   const year = 2026;
   return (
@@ -43,7 +47,7 @@ export default function Footer({
             <li><Link href="/blog" className="hover:text-brass">Blog</Link></li>
             <li><Link href="/hubungi" className="hover:text-brass">Hubungi</Link></li>
             <li><Link href="/portal" className="hover:text-brass">Portal Pelanggan</Link></li>
-            <li><Link href="/pembekal/daftar" className="hover:text-brass">Daftar Pembekal</Link></li>
+            {suppliers && <li><Link href="/pembekal/daftar" className="hover:text-brass">Daftar Pembekal</Link></li>}
           </ul>
         </div>
 
@@ -56,6 +60,15 @@ export default function Footer({
           </ul>
         </div>
       </div>
+      {showPoweredBy && (
+        <div className="border-t border-ink-line bg-ink-soft">
+          <div className="container-c py-3 text-center text-xs text-white/70">
+            ⚡ Dikuasakan oleh{" "}
+            <a href="https://kabinetcantik.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-brass-lite hover:underline">KabinetCantik OS</a>
+            {" "}— bina laman & CRM kabinet anda sendiri.
+          </div>
+        </div>
+      )}
       <div className="border-t border-ink-line">
         <div className="container-c flex flex-col gap-2 py-5 text-xs text-white/50 sm:flex-row sm:justify-between">
           <span>© {year} {brand?.nama || "KabinetCantik"}. Hak cipta terpelihara.</span>

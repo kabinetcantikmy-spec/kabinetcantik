@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { hostBrand } from "@/lib/branding";
 import { currentOrg } from "@/lib/tenant";
 import { loadHomepageConfig } from "@/lib/homepageServer";
+import { planForOrg } from "@/lib/planServer";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -15,12 +16,13 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // Subdomain tak berdaftar → 404 (elak papar kandungan semua tenant).
   if (!isDefault && !orgId) notFound();
   const hp = await loadHomepageConfig(orgId, isDefault);
+  const { features } = await planForOrg(orgId);
   return (
     <>
       <JsonLd data={localBusinessLd(brand.nama, hp.serviceArea)} />
       <Header brand={brand} />
       <main>{children}</main>
-      <Footer brand={brand} area={hp.serviceArea} address={hp.showroomAddress} tagline={hp.heroTagline} />
+      <Footer brand={brand} area={hp.serviceArea} address={hp.showroomAddress} tagline={hp.heroTagline} showPoweredBy={!features.removeBadge} suppliers={features.suppliers} />
       <WhatsAppButton phone={hp.whatsapp} brandName={brand.nama} />
     </>
   );

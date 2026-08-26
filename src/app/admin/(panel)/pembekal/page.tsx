@@ -1,11 +1,30 @@
-import { createSupabaseServer, requireRole } from "@/lib/supabaseServer";
+import Link from "next/link";
+import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseServer";
 import { supabaseReady } from "@/lib/supabase";
+import { planForOrg } from "@/lib/planServer";
 import SupplierAdmin, { SupplierRow, ClaimRow, VoucherRow } from "@/components/admin/SupplierAdmin";
 
 export const dynamic = "force-dynamic";
 
 export default async function PembekalAdminPage() {
   await requireRole(["admin", "finance"]);
+  const staff = await requireStaff();
+  const { features } = await planForOrg(staff.orgId);
+  if (!features.suppliers) {
+    return (
+      <div>
+        <h1 className="h-display text-2xl">Pembekal & Tuntutan</h1>
+        <div className="mt-6 rounded-2xl border border-brass/40 bg-brass/5 p-8 text-center">
+          <div className="text-3xl">🔒</div>
+          <h2 className="mt-3 font-display text-xl font-semibold text-ink">Ciri Pakej Pro</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-ink/60">
+            Portal Pembekal &amp; Installer — urus rangkaian pembekal, tuntutan &amp; baucer bayaran — hanya untuk pakej <b>Pro</b>.
+          </p>
+          <Link href="/admin/tetapan" className="btn-brass mt-5 inline-block text-sm">Naik taraf ke Pro</Link>
+        </div>
+      </div>
+    );
+  }
   let suppliers: SupplierRow[] = [];
   let claims: ClaimRow[] = [];
   let vouchers: VoucherRow[] = [];
