@@ -132,7 +132,7 @@ export async function registerTenant(input: RegisterInput): Promise<RegisterStat
     if (!sent.ok) {
       await sb.auth.admin.deleteUser(uid).catch(() => {});
       await rollbackTenant();
-      return { ok: false, error: "Gagal hantar emel pengesahan. Cuba lagi sekejap." };
+      return { ok: false, error: `Emel pengesahan gagal: ${sent.error || "punca tidak diketahui"}` };
     }
     return { ok: true, mode: "verify", email };
   }

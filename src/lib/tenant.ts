@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 
 const ROOT = "kabinetcantik.com";
@@ -53,4 +54,17 @@ export async function resolveTenant(host: string | null | undefined): Promise<Te
 export async function resolveOrgId(host: string | null | undefined): Promise<string | null> {
   const t = await resolveTenant(host);
   return t?.orgId ?? null;
+}
+
+/**
+ * Untuk laman awam (server component / action): resolve org dari host permintaan.
+ * `isDefault` = tenant KC bare-domain/reserved → benarkan kandungan demo statik.
+ * Tenant subdomain sebenar → isDefault false (hanya papar baris DB org sendiri).
+ */
+export async function currentOrg(): Promise<{ orgId: string | null; isDefault: boolean }> {
+  const host = (await headers()).get("host");
+  const sub = subdomainFromHost(host);
+  const isDefault = !sub || RESERVED.has(sub);
+  const orgId = await resolveOrgId(host);
+  return { orgId, isDefault };
 }
