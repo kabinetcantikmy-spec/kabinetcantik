@@ -1,6 +1,9 @@
 "use server";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { sendEmail, emailShell } from "@/lib/email";
+import { resolveOrgId } from "@/lib/tenant";
+import { tenantBrand } from "@/lib/branding";
+import { headers } from "next/headers";
 
 type Res = { ok: boolean; error?: string };
 
@@ -22,6 +25,7 @@ export async function registerSupplier(input: {
   if (input.password.length < 6) return { ok: false, error: "Kata laluan minimum 6 aksara." };
 
   const sb = createServiceClient();
+  const brand = await tenantBrand(await resolveOrgId((await headers()).get("host")));
 
   // 1) Cipta akaun auth
   const { data: created, error: authErr } = await sb.auth.admin.createUser({
@@ -63,8 +67,9 @@ export async function registerSupplier(input: {
   // 4) Emel pengesahan
   await sendEmail({
     to: input.emel.trim(),
-    subject: "Pendaftaran pembekal diterima — KabinetCantik",
-    html: emailShell("Terima kasih mendaftar", `Permohonan anda sedang disemak. Kami akan maklumkan sebaik sahaja akaun anda diluluskan. Anda boleh log masuk di <b>/pembekal/login</b>.`),
+    fromName: brand.nama,
+    subject: `Pendaftaran pembekal diterima — ${brand.nama}`,
+    html: emailShell("Terima kasih mendaftar", `Permohonan anda sedang disemak. Kami akan maklumkan sebaik sahaja akaun anda diluluskan. Anda boleh log masuk di <b>/pembekal/login</b>.`, brand.nama),
   });
 
   return { ok: true };

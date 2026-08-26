@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { requireStaff, createSupabaseServer } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
+import { tenantBrand } from "@/lib/branding";
 import { waLink } from "@/lib/wa";
 import { waReview } from "@/lib/whatsapp";
 import { revalidatePath } from "next/cache";
@@ -123,9 +124,10 @@ export async function addDesign(projectId: string, tajuk: string, imageUrl: stri
 
 /** Jana token review, simpan, dan pulangkan pautan WA + hantar email jemputan review. */
 export async function requestReview(projectId: string): Promise<Res> {
-  await requireStaff();
+  const staff = await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   const sb = createSupabaseServer();
+  const brand = await tenantBrand(staff.orgId);
   const { data: proj } = await sb
     .from("projects")
     .select("id, tajuk, review_token, customers(nama, telefon, emel)")
@@ -139,16 +141,18 @@ export async function requestReview(projectId: string): Promise<Res> {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const link = `${appUrl}/ulasan/baru/${token}`;
-  const msg = `Hai ${cust?.nama || ""}, terima kasih memilih KabinetCantik! Kongsi pengalaman anda di sini: ${link}`;
+  const msg = `Hai ${cust?.nama || ""}, terima kasih memilih ${brand.nama}! Kongsi pengalaman anda di sini: ${link}`;
 
   if (cust?.emel) {
     await sendEmail({
       to: cust.emel,
-      subject: "Kongsi ulasan projek anda — KabinetCantik",
+      fromName: brand.nama,
+      subject: `Kongsi ulasan projek anda — ${brand.nama}`,
       html: emailShell(
         "Bagaimana projek anda?",
-        `Terima kasih memilih KabinetCantik. Kami hargai jika anda luangkan seminit untuk kongsi ulasan:<br><br>
-         <a href="${link}" style="background:#AE873B;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Tulis Ulasan</a>`
+        `Terima kasih memilih ${brand.nama}. Kami hargai jika anda luangkan seminit untuk kongsi ulasan:<br><br>
+         <a href="${link}" style="background:#AE873B;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Tulis Ulasan</a>`,
+        brand.nama
       ),
     });
   }

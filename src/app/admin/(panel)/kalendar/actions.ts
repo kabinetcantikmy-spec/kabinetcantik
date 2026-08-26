@@ -2,6 +2,7 @@
 import { supabaseReady } from "@/lib/supabase";
 import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
+import { tenantBrand } from "@/lib/branding";
 import { waAppointment } from "@/lib/whatsapp";
 import { revalidatePath } from "next/cache";
 
@@ -28,6 +29,7 @@ export async function createAppointment(input: {
   });
   if (error) return { ok: false, error: error.message };
   const jenisLabel = input.jenis === "install" ? "pemasangan" : "ukur tapak";
+  const brand = await tenantBrand(staff.orgId);
   if (input.lead_id) {
     await sb.from("lead_activity").insert({
       lead_id: input.lead_id,
@@ -40,10 +42,12 @@ export async function createAppointment(input: {
     if (lead?.emel) {
       await sendEmail({
         to: lead.emel,
-        subject: `Pengesahan temujanji ${jenisLabel} — KabinetCantik`,
+        fromName: brand.nama,
+        subject: `Pengesahan temujanji ${jenisLabel} — ${brand.nama}`,
         html: emailShell(
           "Temujanji disahkan",
-          `Hai ${lead.nama || ""}, temujanji <b>${jenisLabel}</b> anda ditetapkan pada <b>${input.tarikh}${input.masa ? " " + input.masa : ""}</b>.${input.catatan ? `<br>Catatan: ${input.catatan}` : ""}<br><br>Jumpa nanti!`
+          `Hai ${lead.nama || ""}, temujanji <b>${jenisLabel}</b> anda ditetapkan pada <b>${input.tarikh}${input.masa ? " " + input.masa : ""}</b>.${input.catatan ? `<br>Catatan: ${input.catatan}` : ""}<br><br>Jumpa nanti!`,
+          brand.nama
         ),
       });
     }

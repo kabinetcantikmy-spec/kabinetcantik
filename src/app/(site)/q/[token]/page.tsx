@@ -5,10 +5,11 @@ import { rm2 } from "@/lib/format";
 import { fmtDate } from "@/lib/format";
 import Logo from "@/components/Logo";
 import AcceptQuote from "@/components/AcceptQuote";
+import { tenantBrand } from "@/lib/branding";
 import { markQuoteViewed } from "./actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Sebut Harga | KabinetCantik", robots: { index: false } };
+export const metadata = { title: "Sebut Harga", robots: { index: false } };
 
 export default async function PublicQuote(props: { params: Promise<{ token: string }> }) {
   const params = await props.params;
@@ -17,6 +18,7 @@ export default async function PublicQuote(props: { params: Promise<{ token: stri
   const { data: quote } = await sb.from("quotations").select("*, leads(nama, telefon)").eq("share_token", params.token).single();
   if (!quote) notFound();
   const q = quote as Quotation & { leads?: { nama: string; telefon: string } | null };
+  const brand = await tenantBrand((quote as { org_id?: string }).org_id);
 
   await markQuoteViewed(params.token);
 
@@ -29,10 +31,9 @@ export default async function PublicQuote(props: { params: Promise<{ token: stri
       <div className="rounded-2xl border border-ink/10 bg-white p-6 sm:p-8">
         <div className="flex items-start justify-between border-b-2 border-brass pb-5">
           <div className="flex items-center gap-3">
-            <Logo className="h-12 w-12" />
+            <Logo className="h-12 w-12" src={brand.logoUrl} alt={brand.nama} />
             <div>
-              <div className="font-display font-semibold tracking-widest text-ink">KABINET CANTIK</div>
-              <div className="font-serif text-sm italic text-gold-shadow">Built to Fit. Styled to Last.</div>
+              <div className="font-display font-semibold tracking-widest text-ink">{brand.nama}</div>
             </div>
           </div>
           <div className="text-right text-sm">

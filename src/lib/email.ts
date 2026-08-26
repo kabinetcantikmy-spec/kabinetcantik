@@ -10,6 +10,12 @@ export interface SendEmailInput {
   to: string | string[];
   subject: string;
   html: string;
+  fromName?: string; // nama jenama tenant untuk pemapar From
+}
+
+function fromAddress(): string {
+  const m = FROM.match(/<([^>]+)>/);
+  return m ? m[1] : FROM;
 }
 
 export async function sendEmail(input: SendEmailInput): Promise<{ ok: boolean; error?: string }> {
@@ -20,7 +26,7 @@ export async function sendEmail(input: SendEmailInput): Promise<{ ok: boolean; e
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: FROM, to, subject: input.subject, html: input.html }),
+      body: JSON.stringify({ from: input.fromName ? `${input.fromName} <${fromAddress()}>` : FROM, to, subject: input.subject, html: input.html }),
     });
     if (!res.ok) {
       const t = await res.text();
@@ -33,13 +39,13 @@ export async function sendEmail(input: SendEmailInput): Promise<{ ok: boolean; e
 }
 
 /** Templat HTML ringkas berjenama. */
-export function emailShell(title: string, body: string): string {
+export function emailShell(title: string, body: string, brandName = "KabinetCantik"): string {
   return `<div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#FAF8F4;padding:24px;border-radius:12px">
     <div style="border-bottom:2px solid #AE873B;padding-bottom:12px;margin-bottom:16px">
-      <span style="font-weight:700;letter-spacing:2px;color:#0B1320">KABINET CANTIK</span>
+      <span style="font-weight:700;letter-spacing:2px;color:#0B1320">${brandName}</span>
     </div>
     <h2 style="color:#0B1320;margin:0 0 8px">${title}</h2>
     <div style="color:#3a3a3a;line-height:1.6;font-size:15px">${body}</div>
-    <p style="margin-top:24px;color:#9a9a9a;font-size:12px">KabinetCantik · Klang Valley</p>
+    <p style="margin-top:24px;color:#9a9a9a;font-size:12px">${brandName}</p>
   </div>`;
 }

@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { supabaseReady } from "@/lib/supabase";
 import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
+import { tenantBrand } from "@/lib/branding";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import { waLink } from "@/lib/wa";
 import { rm2 } from "@/lib/format";
@@ -156,9 +157,10 @@ export async function updateQuoteMeta(
 
 /** Hantar sebut harga: jana share_token, email + WA link ke pelanggan, tanda 'sent'. */
 export async function sendQuotation(quotationId: string): Promise<Res> {
-  await requireStaff();
+  const staff = await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   const sb = createSupabaseServer();
+  const brand = await tenantBrand(staff.orgId);
   const { data: q } = await sb
     .from("quotations")
     .select("id, no_quote, jumlah, status, share_token, leads(nama, telefon, emel)")
@@ -177,11 +179,13 @@ export async function sendQuotation(quotationId: string): Promise<Res> {
   if (lead?.emel) {
     await sendEmail({
       to: lead.emel,
-      subject: `Sebut harga ${q.no_quote} — KabinetCantik`,
+      fromName: brand.nama,
+      subject: `Sebut harga ${q.no_quote} — ${brand.nama}`,
       html: emailShell(
         "Sebut harga anda sedia",
         `Terima kasih atas minat anda. Klik untuk lihat & terima sebut harga:<br><br>
-         <a href="${link}" style="background:#AE873B;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Lihat Sebut Harga</a><br><br>Jumlah: <b>${rm2(Number(q.jumlah))}</b>`
+         <a href="${link}" style="background:#AE873B;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Lihat Sebut Harga</a><br><br>Jumlah: <b>${rm2(Number(q.jumlah))}</b>`,
+        brand.nama
       ),
     });
   }

@@ -6,6 +6,7 @@ import { rm2 } from "@/lib/format";
 import { fmtDate } from "@/lib/format";
 import Logo from "@/components/Logo";
 import PrintButton from "@/components/admin/PrintButton";
+import { tenantBrand } from "@/lib/branding";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ export default async function QuotePrint(props: { params: Promise<{ id: string }
   const list = (items || []) as QuotationItem[];
   const deposit = (q.jumlah * q.deposit_pct) / 100;
   const area = process.env.NEXT_PUBLIC_SERVICE_AREA || "Klang Valley";
+  const brand = await tenantBrand((quote as { org_id?: string }).org_id);
 
   return (
     <div className="mx-auto max-w-3xl bg-white p-8 text-ink print:p-0">
@@ -34,10 +36,9 @@ export default async function QuotePrint(props: { params: Promise<{ id: string }
       {/* Header */}
       <div className="flex items-start justify-between border-b-2 border-brass pb-5">
         <div className="flex items-center gap-3">
-          <Logo className="h-14 w-14" />
+          <Logo className="h-14 w-14" src={brand.logoUrl} alt={brand.nama} />
           <div>
-            <div className="font-display text-xl font-semibold tracking-widest text-ink">KABINET CANTIK</div>
-            <div className="font-serif text-sm italic text-gold-shadow">Built to Fit. Styled to Last.</div>
+            <div className="font-display text-xl font-semibold tracking-widest text-ink">{brand.nama}</div>
             <div className="mt-1 text-xs text-ink/50">Kawasan servis: {area}</div>
           </div>
         </div>
