@@ -1,7 +1,7 @@
 "use server";
 import crypto from "crypto";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { requireStaff } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import { waLink } from "@/lib/wa";
@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
 
 type Res = { ok: boolean; error?: string; id?: string; waLink?: string };
 
-async function sstSettings(sb: ReturnType<typeof createServiceClient>) {
+async function sstSettings(sb: ReturnType<typeof createSupabaseServer>) {
   const { data } = await sb.from("settings").select("key, value").in("key", ["sst_enabled", "sst_rate", "deposit_split"]);
   const map: Record<string, unknown> = {};
   (data || []).forEach((r: { key: string; value: unknown }) => (map[r.key] = r.value));
@@ -21,7 +21,7 @@ async function sstSettings(sb: ReturnType<typeof createServiceClient>) {
   };
 }
 
-async function recalc(sb: ReturnType<typeof createServiceClient>, quotationId: string) {
+async function recalc(sb: ReturnType<typeof createSupabaseServer>, quotationId: string) {
   const { data: items } = await sb.from("quotation_items").select("jumlah").eq("quotation_id", quotationId);
   const subtotal = (items || []).reduce((s: number, i: { jumlah: number }) => s + (Number(i.jumlah) || 0), 0);
   const { data: q } = await sb.from("quotations").select("diskaun").eq("id", quotationId).single();
@@ -36,7 +36,7 @@ async function recalc(sb: ReturnType<typeof createServiceClient>, quotationId: s
 export async function createQuotationForLead(leadId: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { count } = await sb.from("quotations").select("*", { count: "exact", head: true });
   const seq = String((count || 0) + 1).padStart(4, "0");
   const noQuote = `KC-${new Date().getFullYear()}-${seq}`;
@@ -96,7 +96,7 @@ export async function createQuotationForLead(leadId: string): Promise<Res> {
 export async function addItem(quotationId: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("quotation_items").insert({
     quotation_id: quotationId,
     keterangan: "Item baru",
@@ -118,7 +118,7 @@ export async function updateItem(
 ): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: cur } = await sb.from("quotation_items").select("kuantiti, harga_unit").eq("id", itemId).single();
   const kuantiti = patch.kuantiti ?? Number(cur?.kuantiti) ?? 1;
   const harga = patch.harga_unit ?? Number(cur?.harga_unit) ?? 0;
@@ -133,7 +133,7 @@ export async function updateItem(
 export async function removeItem(itemId: string, quotationId: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   await sb.from("quotation_items").delete().eq("id", itemId);
   await recalc(sb, quotationId);
   revalidatePath(`/admin/sebutharga/${quotationId}`);
@@ -146,7 +146,7 @@ export async function updateQuoteMeta(
 ): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("quotations").update(patch).eq("id", quotationId);
   if (error) return { ok: false, error: error.message };
   await recalc(sb, quotationId);
@@ -158,7 +158,7 @@ export async function updateQuoteMeta(
 export async function sendQuotation(quotationId: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: q } = await sb
     .from("quotations")
     .select("id, no_quote, jumlah, status, share_token, leads(nama, telefon, emel)")
@@ -194,7 +194,7 @@ export async function sendQuotation(quotationId: string): Promise<Res> {
 export async function reviseQuotation(quotationId: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: q } = await sb.from("quotations").select("*").eq("id", quotationId).single();
   if (!q) return { ok: false, error: "Sebut harga tidak dijumpai." };
 
@@ -240,7 +240,7 @@ export async function reviseQuotation(quotationId: string): Promise<Res> {
 export async function setQuoteStatus(quotationId: string, status: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const patch: Record<string, unknown> = { status };
   if (status === "accepted") patch.accepted_at = new Date().toISOString();
   const { error } = await sb.from("quotations").update(patch).eq("id", quotationId);

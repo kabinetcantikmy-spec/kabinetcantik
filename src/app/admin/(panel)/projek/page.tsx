@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { rm } from "@/lib/format";
 import { fmtDate } from "@/lib/format";
 import ProjectCreate, { QuoteOpt } from "@/components/admin/ProjectCreate";
@@ -19,7 +20,7 @@ export default async function ProjekPage() {
   let projects: ProjRow[] = [];
   let quotes: QuoteOpt[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data: pr } = await sb.from("projects").select("id, tajuk, status, nilai_kontrak, created_at, customers(nama)").order("created_at", { ascending: false });
     projects = (pr || []) as unknown as ProjRow[];
 

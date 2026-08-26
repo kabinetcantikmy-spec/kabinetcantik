@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { fmtDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,7 @@ interface CustomerRow {
 export default async function PelangganPage() {
   let customers: CustomerRow[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data } = await sb
       .from("customers")
       .select("id, nama, telefon, emel, created_at, projects(id)")

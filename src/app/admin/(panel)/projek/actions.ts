@@ -1,7 +1,7 @@
 "use server";
 import crypto from "crypto";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { requireStaff } from "@/lib/supabaseServer";
+import { requireStaff, createSupabaseServer } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
 import { waLink } from "@/lib/wa";
 import { waReview } from "@/lib/whatsapp";
@@ -11,9 +11,9 @@ type Res = { ok: boolean; error?: string; id?: string; waLink?: string };
 
 /** Cipta projek dari sebut harga yang diterima. Auto: customer + deposit payment. */
 export async function createProjectFromQuote(quotationId: string): Promise<Res> {
-  await requireStaff();
+  const staff = await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
 
   const { data: q } = await sb
     .from("quotations")
@@ -64,16 +64,18 @@ export async function createProjectFromQuote(quotationId: string): Promise<Res> 
   if (customerId && lead?.emel) {
     try {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-      const { data: invited, error: invErr } = await sb.auth.admin.inviteUserByEmail(lead.emel, {
+      const admin = createServiceClient();
+      const { data: invited, error: invErr } = await admin.auth.admin.inviteUserByEmail(lead.emel, {
         redirectTo: `${appUrl}/auth/callback?next=/portal`,
       });
       if (!invErr && invited?.user) {
-        await sb.from("profiles").upsert({
+        await admin.from("profiles").upsert({
           id: invited.user.id,
           nama: lead.nama,
           emel: lead.emel,
           role: "customer",
           customer_id: customerId,
+          org_id: staff.orgId,
         });
       }
     } catch {
@@ -88,7 +90,7 @@ export async function createProjectFromQuote(quotationId: string): Promise<Res> 
 export async function updateProjectStatus(projectId: string, status: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const patch: Record<string, unknown> = { status };
   if (status === "Siap") patch.warranty_until = new Date(new Date().setFullYear(new Date().getFullYear() + 5)).toISOString().slice(0, 10);
   const { error } = await sb.from("projects").update(patch).eq("id", projectId);
@@ -101,7 +103,7 @@ export async function addPayment(projectId: string, jenis: string, jumlah: numbe
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   if (!jumlah || jumlah <= 0) return { ok: false, error: "Jumlah tidak sah." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("payments").insert({ project_id: projectId, jenis, jumlah, status: "pending" });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/admin/projek/${projectId}`);
@@ -112,7 +114,7 @@ export async function addDesign(projectId: string, tajuk: string, imageUrl: stri
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   if (!imageUrl.trim()) return { ok: false, error: "Pautan imej wajib." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("project_designs").insert({ project_id: projectId, tajuk: tajuk || null, image_url: imageUrl.trim(), status: "pending" });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/admin/projek/${projectId}`);
@@ -123,7 +125,7 @@ export async function addDesign(projectId: string, tajuk: string, imageUrl: stri
 export async function requestReview(projectId: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: proj } = await sb
     .from("projects")
     .select("id, tajuk, review_token, customers(nama, telefon, emel)")
@@ -162,7 +164,7 @@ export async function requestReview(projectId: string): Promise<Res> {
 export async function updateWarrantyStatus(claimId: string, projectId: string, status: string, tindakan?: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("warranty_claims").update({ status, tindakan: tindakan || null }).eq("id", claimId);
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/admin/projek/${projectId}`);

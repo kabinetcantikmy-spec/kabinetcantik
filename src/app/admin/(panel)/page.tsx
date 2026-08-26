@@ -1,4 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import { STAGES, STAGE_ACCENT, LOST } from "@/lib/crm";
 import { rm } from "@/lib/format";
 
@@ -13,7 +14,7 @@ interface LeadRow {
 
 async function getStats() {
   if (!supabaseReady()) return null;
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data } = await sb.from("leads").select("stage, budget_max, created_at, kategori");
   const leads = (data || []) as LeadRow[];
 

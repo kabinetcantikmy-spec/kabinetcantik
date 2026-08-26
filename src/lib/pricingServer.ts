@@ -1,4 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import { PRICING, PricingConfig } from "@/lib/pricing";
 
 /**
@@ -8,8 +9,8 @@ import { PRICING, PricingConfig } from "@/lib/pricing";
 export async function loadPricingConfig(): Promise<PricingConfig> {
   if (!supabaseReady()) return PRICING;
   try {
-    const sb = createServiceClient();
-    const { data } = await sb.from("settings").select("value").eq("key", "pricing").single();
+    const sb = createSupabaseServer();
+    const { data } = await sb.from("settings").select("value").eq("key", "pricing").limit(1).maybeSingle();
     const cfg = data?.value as Partial<PricingConfig> | undefined;
     if (cfg && Array.isArray(cfg.categories) && cfg.categories.length) {
       return {

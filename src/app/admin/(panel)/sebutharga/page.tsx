@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { Quotation } from "@/lib/crm";
 import { rm } from "@/lib/format";
 import { fmtDate } from "@/lib/format";
@@ -16,7 +17,7 @@ const STATUS_LABEL: Record<string, string> = {
 export default async function QuotationsPage() {
   let quotes: (Quotation & { leads?: { nama: string } | null })[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data } = await sb
       .from("quotations")
       .select("*, leads(nama)")

@@ -1,5 +1,5 @@
-import { requireRole } from "@/lib/supabaseServer";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireRole } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import SettingsEditor, { StaffUser } from "@/components/admin/SettingsEditor";
 
@@ -11,7 +11,7 @@ export default async function TetapanPage() {
   let users: StaffUser[] = [];
   let waEnabled = false;
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data } = await sb.from("profiles").select("id, nama, emel, role").order("role");
     users = (data || []) as StaffUser[];
     const { data: waRow } = await sb.from("settings").select("value").eq("key", "wa_automation_enabled").single();
