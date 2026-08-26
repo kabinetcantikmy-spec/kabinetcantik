@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Logo from "./Logo";
 
-export default function Footer() {
+export default function Footer({ brand }: { brand?: { nama: string; logoUrl: string } }) {
   const area = process.env.NEXT_PUBLIC_SERVICE_AREA || "Klang Valley";
   const address = process.env.NEXT_PUBLIC_SHOWROOM_ADDRESS || "";
   const year = 2026;
@@ -10,9 +10,9 @@ export default function Footer() {
       <div className="container-c grid gap-10 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3">
-            <Logo className="h-12 w-12" />
+            <Logo src={brand?.logoUrl} alt={brand?.nama} className="h-12 w-12" />
             <span className="font-display text-lg font-semibold tracking-[0.15em] text-tan">
-              KABINET CANTIK
+              {brand?.nama || "KabinetCantik"}
             </span>
           </div>
           <p className="mt-4 max-w-sm font-serif text-lg italic text-brass-lite">
@@ -50,7 +50,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-ink-line">
         <div className="container-c flex flex-col gap-2 py-5 text-xs text-white/50 sm:flex-row sm:justify-between">
-          <span>© {year} KabinetCantik. Hak cipta terpelihara.</span>
+          <span>© {year} {brand?.nama || "KabinetCantik"}. Hak cipta terpelihara.</span>
           <span className="space-x-4">
             <Link href="/privasi" className="hover:text-brass">Privasi</Link>
             <Link href="/terma" className="hover:text-brass">Terma</Link>

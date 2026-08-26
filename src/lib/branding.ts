@@ -1,4 +1,5 @@
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { resolveTenant } from "@/lib/tenant";
 
 export interface Brand {
   nama: string;
@@ -22,6 +23,22 @@ export async function tenantBrand(orgId: string | null | undefined): Promise<Bra
     const b = (data.branding as Record<string, unknown>) || {};
     return {
       nama: (data.nama as string) || DEFAULT_BRAND.nama,
+      logoUrl: (b.logo_url as string) || DEFAULT_BRAND.logoUrl,
+      accent: (b.warna as string) || DEFAULT_BRAND.accent,
+    };
+  } catch {
+    return DEFAULT_BRAND;
+  }
+}
+
+/** Jenama tenant ikut host (untuk laman awam). Fallback ke KC default. */
+export async function hostBrand(host: string | null | undefined): Promise<Brand> {
+  try {
+    const t = await resolveTenant(host);
+    if (!t) return DEFAULT_BRAND;
+    const b = t.branding || {};
+    return {
+      nama: t.nama || DEFAULT_BRAND.nama,
       logoUrl: (b.logo_url as string) || DEFAULT_BRAND.logoUrl,
       accent: (b.warna as string) || DEFAULT_BRAND.accent,
     };

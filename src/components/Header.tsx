@@ -11,15 +11,15 @@ const NAV = [
   { href: "/hubungi", label: "Hubungi" },
 ];
 
-export default function Header() {
+export default function Header({ brand }: { brand?: { nama: string; logoUrl: string } }) {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-ink/10 bg-paper/90 backdrop-blur">
       <div className="container-c flex items-center gap-4 py-3">
         <Link href="/" className="flex items-center gap-3">
-          <Logo className="h-11 w-11" />
+          <Logo src={brand?.logoUrl} alt={brand?.nama} className="h-11 w-11" />
           <span className="font-display text-lg font-semibold tracking-[0.15em] text-ink">
-            KABINET CANTIK
+            {brand?.nama || "KabinetCantik"}
           </span>
         </Link>
 
