@@ -1,4 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import { Lead } from "@/lib/crm";
 import KanbanBoard from "@/components/admin/KanbanBoard";
 import LeadCreate from "@/components/admin/LeadCreate";
@@ -7,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 async function getLeads(): Promise<Lead[]> {
   if (!supabaseReady()) return [];
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data } = await sb.from("leads").select("*").order("created_at", { ascending: false });
   return (data || []) as Lead[];
 }

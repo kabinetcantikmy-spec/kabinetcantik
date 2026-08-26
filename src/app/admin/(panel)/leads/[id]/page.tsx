@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import { Lead, LeadActivity } from "@/lib/crm";
 import { rm } from "@/lib/format";
 import { fmtDateTime, fmtDate } from "@/lib/format";
@@ -15,7 +16,7 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
   if (!supabaseReady()) {
     return <div className="rounded-xl border border-dashed border-ink/20 bg-white p-8 text-center text-ink/50">Supabase belum dikonfigurasi.</div>;
   }
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: lead } = await sb.from("leads").select("*").eq("id", params.id).single();
   if (!lead) notFound();
   const l = lead as Lead;

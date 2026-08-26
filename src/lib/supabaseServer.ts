@@ -38,6 +38,7 @@ export interface StaffContext {
   emel: string;
   nama: string;
   role: StaffRole;
+  orgId: string | null;
 }
 
 /** Pastikan pengguna log masuk & staf. Redirect ke /admin/login jika tidak. */
@@ -50,7 +51,7 @@ export async function requireStaff(): Promise<StaffContext> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("nama, emel, role")
+    .select("nama, emel, role, org_id")
     .eq("id", user.id)
     .single();
 
@@ -63,6 +64,7 @@ export async function requireStaff(): Promise<StaffContext> {
     emel: profile?.emel || user.email || "",
     nama: profile?.nama || user.email || "Staf",
     role: role as StaffRole,
+    orgId: (profile?.org_id as string) || null,
   };
 }
 
