@@ -19,6 +19,10 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <span className="font-display text-sm font-semibold tracking-widest text-tan">{brand.nama}</span>
         </Link>
         <AdminNav />
+        {staff.isPlatformAdmin && (
+          <Link href="/admin/owner" className="mt-2 rounded-lg bg-brass/20 px-3 py-2 text-sm font-semibold text-tan hover:bg-brass/30">⚙ Kawalan Platform
+          </Link>
+        )}
         <div className="mt-auto border-t border-ink-line pt-3">
           <div className="px-3 text-xs text-white/50">{staff.nama}</div>
           <div className="px-3 pb-2 text-[11px] uppercase tracking-wider text-brass-lite">{staff.role}</div>
