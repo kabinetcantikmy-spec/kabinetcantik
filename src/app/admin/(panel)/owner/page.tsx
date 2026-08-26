@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/supabaseServer";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import CreateTenantForm from "./CreateTenantForm";
+import { setTenantPlan } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,17 @@ export default async function OwnerPage() {
                 <tr key={t.id} className="border-t border-ink/10">
                   <td className="px-4 py-3 font-medium">{t.nama}</td>
                   <td className="px-4 py-3 font-mono text-ink/60">{t.slug}</td>
-                  <td className="px-4 py-3 uppercase text-ink/60">{t.plan}</td>
+                  <td className="px-4 py-3">
+                    <form action={setTenantPlan.bind(null, t.id)} className="flex items-center gap-1">
+                      <select name="plan" defaultValue={t.plan} className="rounded border border-ink/15 bg-paper px-2 py-1 text-xs">
+                        <option value="trial">Trial</option>
+                        <option value="freemium">Freemium</option>
+                        <option value="hero">Hero</option>
+                        <option value="pro">Pro</option>
+                      </select>
+                      <button className="rounded bg-ink px-2 py-1 text-xs text-off-white">Set</button>
+                    </form>
+                  </td>
                   <td className="px-4 py-3">{t.status}</td>
                   <td className="px-4 py-3 text-ink/60">{t.status === "trial" && dl !== null ? `${dl} hari` : "—"}</td>
                 </tr>

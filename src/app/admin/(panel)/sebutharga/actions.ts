@@ -4,6 +4,7 @@ import { supabaseReady } from "@/lib/supabase";
 import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
 import { tenantBrand } from "@/lib/branding";
+import { planForOrg } from "@/lib/planServer";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import { waLink } from "@/lib/wa";
 import { rm2 } from "@/lib/format";
@@ -161,6 +162,8 @@ export async function sendQuotation(quotationId: string): Promise<Res> {
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   const sb = createSupabaseServer();
   const brand = await tenantBrand(staff.orgId);
+  const { features: planFeat } = await planForOrg(staff.orgId);
+  if (!planFeat.sendBrandedQuote) return { ok: false, error: "Hantar quote berjenama tersedia untuk pakej Hero ke atas." };
   const { data: q } = await sb
     .from("quotations")
     .select("id, no_quote, jumlah, status, share_token, leads(nama, telefon, emel)")

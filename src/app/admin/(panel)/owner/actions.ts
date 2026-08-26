@@ -119,3 +119,15 @@ export async function createTenant(
   revalidatePath("/admin/owner");
   return { ok: true, nama, slug, email, password, existing };
 }
+
+export async function setTenantPlan(tenantId: string, formData: FormData): Promise<void> {
+  await ensureOwner();
+  if (!supabaseReady()) return;
+  const plan = String(formData.get("plan") || "");
+  if (!["trial", "freemium", "hero", "pro"].includes(plan)) return;
+  const sb = createServiceClient();
+  const patch: Record<string, unknown> = { plan, status: plan === "trial" ? "trial" : "active" };
+  if (plan === "trial") patch.trial_ends_at = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString();
+  await sb.from("tenants").update(patch).eq("id", tenantId);
+  revalidatePath("/admin/owner");
+}

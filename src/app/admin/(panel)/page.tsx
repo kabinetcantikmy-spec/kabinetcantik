@@ -5,6 +5,9 @@ import { STAGES, STAGE_ACCENT, LOST } from "@/lib/crm";
 import { rm } from "@/lib/format";
 import { loadOnboarding } from "@/lib/onboardingServer";
 import { SETUP_STEPS } from "@/lib/onboarding";
+import { requireStaff } from "@/lib/supabaseServer";
+import { planForOrg } from "@/lib/planServer";
+import { PLAN_LABEL } from "@/lib/plan";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +72,8 @@ export default async function Dashboard() {
   const stats = await getStats();
   const onboarding = await loadOnboarding();
   const setupDone = SETUP_STEPS.filter((x) => onboarding.steps[x.key]).length;
+  const staff = await requireStaff();
+  const plan = await planForOrg(staff.orgId);
 
   return (
     <div>
@@ -80,6 +85,20 @@ export default async function Dashboard() {
           </div>
           <span className="whitespace-nowrap rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-off-white">Teruskan setup →</span>
         </Link>
+      )}
+      {plan.status === "trial" && plan.trialDaysLeft !== null && plan.trialDaysLeft > 0 && (
+        <div className="mb-5 rounded-xl border border-brass/30 bg-brass/5 px-5 py-3 text-sm text-ink/70">
+          ⏳ <b>Trial Pro</b> — {plan.trialDaysLeft} hari lagi. Anda menikmati semua ciri sepenuhnya.
+        </div>
+      )}
+      {plan.status === "trial" && plan.trialDaysLeft !== null && plan.trialDaysLeft <= 0 && (
+        <Link href="/admin/tetapan" className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm">
+          <span className="text-red-700"><b>Trial tamat</b> — akaun kini pada pakej Freemium (ciri terhad).</span>
+          <span className="whitespace-nowrap font-semibold text-red-700">Naik taraf →</span>
+        </Link>
+      )}
+      {plan.status !== "trial" && (
+        <div className="mb-5 text-xs text-ink/40">Pakej semasa: <b className="text-ink/70">{PLAN_LABEL[plan.plan]}</b></div>
       )}
       <div className="flex items-start justify-between">
         <div>

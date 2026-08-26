@@ -2,6 +2,7 @@
 import { supabaseReady, createServiceClient } from "@/lib/supabase";
 import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseServer";
 import { PricingConfig } from "@/lib/pricing";
+import { planForOrg } from "@/lib/planServer";
 import { HomepageConfig } from "@/lib/homepage";
 import { revalidatePath } from "next/cache";
 
@@ -28,6 +29,9 @@ export async function savePricingConfig(config: PricingConfig): Promise<Res> {
 export async function setWaAutomation(enabled: boolean): Promise<Res> {
   await requireRole(["admin"]);
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
+  const staff = await requireStaff();
+  const { features } = await planForOrg(staff.orgId);
+  if (enabled && !features.waAutomation) return { ok: false, error: "Automasi WhatsApp tersedia untuk pakej Hero ke atas." };
   const sb = createSupabaseServer();
   const { error } = await sb.from("settings").upsert({ key: "wa_automation_enabled", value: enabled }, { onConflict: "org_id,key" });
   if (error) return { ok: false, error: error.message };
