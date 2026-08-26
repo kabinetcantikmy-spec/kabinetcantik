@@ -1,12 +1,13 @@
 "use client";
 import { useState } from "react";
-import { saveHomepageConfig } from "@/app/admin/(panel)/tetapan/actions";
+import { saveHomepageConfig, uploadHomepageImage } from "@/app/admin/(panel)/tetapan/actions";
 import { HomepageConfig } from "@/lib/homepage";
 
 export default function HomepageEditor({ initial }: { initial: HomepageConfig }) {
   const [c, setC] = useState<HomepageConfig>(initial);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [uploading, setUploading] = useState<string | null>(null);
 
   function setField<K extends keyof HomepageConfig>(k: K, v: HomepageConfig[K]) {
     setC((prev) => ({ ...prev, [k]: v }));
@@ -17,6 +18,25 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
       stats[i] = { ...stats[i], [key]: v };
       return { ...prev, stats };
     });
+  }
+
+  async function onImg(e: React.ChangeEvent<HTMLInputElement>, field: "heroImage" | "beforeImage" | "afterImage", slot: string) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setUploading(slot);
+    setMsg(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", f);
+      fd.append("slot", slot);
+      const res = await uploadHomepageImage(fd);
+      if (!res.ok || !res.url) throw new Error(res.error || "gagal");
+      setField(field, res.url);
+    } catch (err) {
+      setMsg({ ok: false, text: err instanceof Error ? err.message : "Muat naik imej gagal. Cuba imej lain (PNG/JPG)." });
+    } finally {
+      setUploading(null);
+    }
   }
 
   async function save() {
@@ -62,6 +82,28 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
             <div key={i} className="space-y-2 rounded-lg border border-ink/10 p-3">
               <input className={input} placeholder="cth: 10+" value={s.n} onChange={(e) => setStat(i, "n", e.target.value)} />
               <input className={input} placeholder="cth: Tahun pengalaman" value={s.l} onChange={(e) => setStat(i, "l", e.target.value)} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-5">
+        <div className={label}>Gambar laman</div>
+        <p className="mt-1 text-xs text-ink/40">Latar hero & gambar sebelum/selepas. Guna gambar projek sendiri untuk laman yang unik (bukan stok).</p>
+        <div className="mt-2 grid gap-3 sm:grid-cols-3">
+          {([
+            { slot: "hero", field: "heroImage", title: "Latar Hero" },
+            { slot: "before", field: "beforeImage", title: "Sebelum" },
+            { slot: "after", field: "afterImage", title: "Selepas" },
+          ] as const).map((it) => (
+            <div key={it.slot} className="space-y-2 rounded-lg border border-ink/10 p-3">
+              <div className={label}>{it.title}</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={c[it.field]} alt={it.title} className="aspect-video w-full rounded border border-ink/10 object-cover" />
+              <label className="block cursor-pointer rounded-lg border border-ink/15 px-3 py-2 text-center text-xs hover:bg-paper">
+                {uploading === it.slot ? "Memuat naik…" : "Tukar gambar"}
+                <input type="file" accept="image/*" className="hidden" disabled={uploading !== null} onChange={(e) => onImg(e, it.field, it.slot)} />
+              </label>
             </div>
           ))}
         </div>

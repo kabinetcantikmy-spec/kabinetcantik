@@ -10,7 +10,7 @@ export default function Hero({ hp = DEFAULT_HOMEPAGE }: { hp?: HomepageConfig })
       {/* Latar hero */}
       <div className="absolute inset-0 -z-10">
         <Image
-          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1900&q=80"
+          src={hp.heroImage || DEFAULT_HOMEPAGE.heroImage}
           alt="Dapur kustom"
           fill
           priority

@@ -77,7 +77,7 @@ export default function MaterialsEditor({ materials }: { materials: Material[] }
                   <input type="checkbox" defaultChecked={m.aktif} onChange={(e) => patch(m.id, { aktif: e.target.checked })} />
                 </td>
                 <td className="px-3 py-2">
-                  <button onClick={() => startTransition(async () => { await deleteMaterial(m.id); refresh(); })} className="text-red-400 hover:text-red-600">✕</button>
+                  <button onClick={() => { if (confirm("Padam bahan ini?")) startTransition(async () => { await deleteMaterial(m.id); refresh(); }); }} className="text-red-400 hover:text-red-600">✕</button>
                 </td>
               </tr>
             ))}

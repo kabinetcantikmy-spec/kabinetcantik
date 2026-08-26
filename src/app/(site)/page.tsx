@@ -110,8 +110,8 @@ export default async function HomePage() {
         <h2 className="mt-2 h-display text-3xl">Sebelum & selepas</h2>
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <BeforeAfter
-            before="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&q=80"
-            after="https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&q=80"
+            before={hp.beforeImage}
+            after={hp.afterImage}
             alt="Dapur"
           />
           <div className="flex flex-col justify-center">

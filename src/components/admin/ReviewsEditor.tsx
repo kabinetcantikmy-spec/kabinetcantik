@@ -44,7 +44,7 @@ export default function ReviewsEditor({ reviews }: { reviews: Review[] }) {
               <input type="checkbox" checked={r.diterbitkan} onChange={(e) => startTransition(async () => { await togglePublishReview(r.id, e.target.checked); refresh(); })} />
               Terbit
             </label>
-            <button onClick={() => startTransition(async () => { await deleteReview(r.id); refresh(); })} className="text-red-400 hover:text-red-600">✕</button>
+            <button onClick={() => { if (confirm("Padam ulasan ini?")) startTransition(async () => { await deleteReview(r.id); refresh(); }); }} className="text-red-400 hover:text-red-600">✕</button>
           </div>
         ))}
         {reviews.length === 0 && <p className="text-sm text-ink/40">Belum ada ulasan.</p>}

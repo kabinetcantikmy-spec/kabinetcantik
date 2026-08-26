@@ -99,3 +99,27 @@ export async function uploadBrandingLogo(formData: FormData): Promise<{ ok: bool
   const { data } = sb.storage.from("lead-photos").getPublicUrl(path);
   return { ok: true, url: data?.publicUrl };
 }
+
+
+export async function uploadHomepageImage(formData: FormData): Promise<{ ok: boolean; url?: string; error?: string }> {
+  const staff = await requireStaff();
+  if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
+  if (!staff.orgId) return { ok: false, error: "Tiada org untuk akaun ini." };
+  const file = formData.get("file");
+  const slotRaw = String(formData.get("slot") || "hero");
+  const slot = ["hero", "before", "after"].includes(slotRaw) ? slotRaw : "hero";
+  if (!(file instanceof File) || file.size === 0) return { ok: false, error: "Tiada fail dipilih." };
+  if (file.size > 5 * 1024 * 1024) return { ok: false, error: "Saiz imej maksimum 5MB." };
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  const path = `homepage/${staff.orgId}/${slot}-${Date.now()}.${ext}`;
+  // Service-role — pintas storage RLS.
+  const sb = createServiceClient();
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const { error } = await sb.storage.from("lead-photos").upload(path, bytes, {
+    contentType: file.type || "image/jpeg",
+    upsert: true,
+  });
+  if (error) return { ok: false, error: error.message };
+  const { data } = sb.storage.from("lead-photos").getPublicUrl(path);
+  return { ok: true, url: data?.publicUrl };
+}
