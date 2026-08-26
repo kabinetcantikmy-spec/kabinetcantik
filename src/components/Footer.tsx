@@ -1,9 +1,17 @@
 import Link from "next/link";
 import Logo from "./Logo";
 
-export default function Footer({ brand }: { brand?: { nama: string; logoUrl: string } }) {
-  const area = process.env.NEXT_PUBLIC_SERVICE_AREA || "Klang Valley";
-  const address = process.env.NEXT_PUBLIC_SHOWROOM_ADDRESS || "";
+export default function Footer({
+  brand,
+  area = "Klang Valley",
+  address = "",
+  tagline = "Built to Fit. Styled to Last.",
+}: {
+  brand?: { nama: string; logoUrl: string };
+  area?: string;
+  address?: string;
+  tagline?: string;
+}) {
   const year = 2026;
   return (
     <footer className="mt-24 bg-ink text-off-white">
@@ -16,7 +24,7 @@ export default function Footer({ brand }: { brand?: { nama: string; logoUrl: str
             </span>
           </div>
           <p className="mt-4 max-w-sm font-serif text-lg italic text-brass-lite">
-            Built to Fit. Styled to Last.
+            {tagline}
           </p>
           <p className="mt-3 max-w-sm text-sm text-white/60">
             Reka bentuk & fabrikasi kabinet dapur, wardrobe, TV cabinet dan wall panelling kustom.

@@ -6,6 +6,7 @@ import BeforeAfter from "@/components/BeforeAfter";
 import { getFeaturedProjects } from "@/lib/portfolioDb";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { currentOrg } from "@/lib/tenant";
+import { loadHomepageConfig } from "@/lib/homepageServer";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,7 @@ interface HomeReview { nama: string; rating: number; ulasan: string | null }
 
 export default async function HomePage() {
   const { orgId, isDefault } = await currentOrg();
+  const hp = await loadHomepageConfig(orgId, isDefault);
   const featured = (await getFeaturedProjects(orgId, isDefault)).slice(0, 6);
 
   let testimonials: { name: string; text: string; rating: number; area?: string }[] = (isDefault ? TESTIMONIALS : []).map((t) => ({
@@ -49,7 +51,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero />
+      <Hero hp={hp} />
       <CategoryTiles />
 
       {/* Featured portfolio */}

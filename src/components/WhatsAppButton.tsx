@@ -1,13 +1,16 @@
-import { waSalesLink } from "@/lib/wa";
+import { waLink } from "@/lib/wa";
 
-export default function WhatsAppButton() {
-  const href = waSalesLink("Hai KabinetCantik, saya berminat nak dapatkan sebut harga kabinet.");
+/** Butang WhatsApp terapung. Papar hanya jika tenant ada set nombor. */
+export default function WhatsAppButton({ phone, brandName }: { phone?: string; brandName?: string }) {
+  if (!phone) return null;
+  const nama = brandName || "kami";
+  const href = waLink(phone, `Hai ${nama}, saya berminat nak dapatkan sebut harga kabinet.`);
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="WhatsApp KabinetCantik"
+      aria-label={`WhatsApp ${nama}`}
       className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] shadow-lg transition hover:scale-105"
     >
       <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff">
