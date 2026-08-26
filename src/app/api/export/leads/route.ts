@@ -1,5 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { requireStaff } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
+import { requireStaff, createSupabaseServer } from "@/lib/supabaseServer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,7 +9,7 @@ const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
 export async function GET() {
   await requireStaff();
   if (!supabaseReady()) return new Response("Supabase belum dikonfigurasi.", { status: 500 });
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data } = await sb
     .from("leads")
     .select("nama, telefon, emel, stage, source, budget_min, budget_max, created_at")
