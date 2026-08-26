@@ -41,7 +41,7 @@ export async function createQuotationForLead(leadId: string): Promise<Res> {
   const sb = createSupabaseServer();
   const { count } = await sb.from("quotations").select("*", { count: "exact", head: true });
   const seq = String((count || 0) + 1).padStart(4, "0");
-  const noQuote = `KC-${new Date().getFullYear()}-${seq}`;
+  const noQuote = `SH-${new Date().getFullYear()}-${seq}`;
   const { depositPct } = await sstSettings(sb);
   const { data, error } = await sb
     .from("quotations")
