@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/supabaseServer";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { createTenant } from "./actions";
+import CreateTenantForm from "./CreateTenantForm";
 
 export const dynamic = "force-dynamic";
 
@@ -47,16 +47,7 @@ export default async function OwnerPage() {
         <div className="rounded-xl border border-ink/10 bg-white p-4"><div className="text-xs uppercase tracking-wider text-ink/50">Berbayar</div><div className="mt-1 font-display text-2xl font-semibold">{activeCount}</div></div>
       </div>
 
-      <div className="mt-6 rounded-xl border border-ink/10 bg-white p-5">
-        <h2 className="font-display text-lg font-semibold">Cipta tenant baru</h2>
-        <form action={createTenant} className="mt-4 grid gap-3 sm:grid-cols-4">
-          <input name="nama" required placeholder="Nama syarikat" className="rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm" />
-          <input name="slug" required placeholder="slug (cth: melecun)" className="rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm" />
-          <input name="email" type="email" placeholder="Emel admin (optional)" className="rounded-lg border border-ink/15 bg-paper px-3 py-2 text-sm" />
-          <button className="btn-brass text-sm">Cipta + jemput</button>
-        </form>
-        <p className="mt-2 text-xs text-ink/40">Trial 14 hari dimulakan automatik. Alamat: <span className="font-mono">slug.kabinetcantik.com</span></p>
-      </div>
+      <CreateTenantForm />
 
       <div className="mt-6 overflow-x-auto rounded-xl border border-ink/10 bg-white">
         <table className="w-full text-sm">

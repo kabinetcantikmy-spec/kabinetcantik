@@ -9,9 +9,12 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 /**
- * Auth callback — tukar `code` (PKCE) atau `token_hash` (invite/magiclink/recovery)
- * kepada sesi login, kemudian redirect ke `next`. Ini yang membolehkan magic-link
- * & jemputan portal betul-betul log masuk pengguna.
+ * Auth callback — tukar `code` (PKCE) atau `token_hash` (magic-link/recovery)
+ * kepada sesi login, kemudian redirect ke `next`.
+ *
+ * Nota: onboarding tenant TIDAK guna magic-link lagi — admin dicipta terus
+ * dengan kata laluan (lihat owner/actions.ts) & log masuk di /admin/login.
+ * Route ni kekal untuk reset kata laluan / magic-link portal pelanggan.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -41,5 +44,7 @@ export async function GET(request: NextRequest) {
     ok = !error;
   }
 
-  return NextResponse.redirect(`${origin}${ok ? next : "/portal/login?e=pautan"}`);
+  // Jika gagal: hantar ke pintu login yang betul mengikut destinasi.
+  const loginFallback = next.startsWith("/admin") ? "/admin/login" : "/portal/login";
+  return NextResponse.redirect(`${origin}${ok ? next : `${loginFallback}?e=pautan`}`);
 }
