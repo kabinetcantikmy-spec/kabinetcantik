@@ -25,9 +25,29 @@ export default function ProjectManage({
   const [payAmt, setPayAmt] = useState("");
   const [dTajuk, setDTajuk] = useState("");
   const [dUrl, setDUrl] = useState("");
+  const [nota, setNota] = useState("");
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
+      {/* Laporan Progres untuk pelanggan */}
+      <div className="rounded-xl border border-brass/30 bg-brass/[0.03] p-4 lg:col-span-2">
+        <h3 className="font-display font-semibold text-ink">Laporan Progres untuk pelanggan</h3>
+        <p className="mt-1 text-sm text-ink/50">Taip kemas kini ringkas, jana PDF berjenama untuk dihantar ke pelanggan (WhatsApp/emel).</p>
+        <textarea
+          value={nota}
+          onChange={(e) => setNota(e.target.value)}
+          placeholder="Cth: Kabinet dah siap difabrikasi. Pemasangan dijadualkan minggu depan, insyaAllah siap sepenuhnya hujung bulan."
+          className="mt-2 h-20 w-full rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm"
+        />
+        <button
+          type="button"
+          onClick={() => window.open(`/admin/projek/${projectId}/laporan?nota=${encodeURIComponent(nota)}`, "_blank")}
+          className="btn-brass mt-2 !px-4 !py-2 text-sm"
+        >
+          Jana Laporan PDF →
+        </button>
+      </div>
+
       {/* Status + designs */}
       <div className="space-y-6">
         <div className="rounded-xl border border-ink/10 bg-white p-4">
