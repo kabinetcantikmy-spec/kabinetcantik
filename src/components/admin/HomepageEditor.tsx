@@ -21,6 +21,14 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
     });
   }
 
+  function setStep(i: number, key: "t" | "d", v: string) {
+    setC((prev) => {
+      const steps = prev.processSteps.slice();
+      steps[i] = { ...steps[i], [key]: v };
+      return { ...prev, processSteps: steps };
+    });
+  }
+
   async function onImg(e: React.ChangeEvent<HTMLInputElement>, field: "heroImage" | "beforeImage" | "afterImage", slot: string) {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -158,6 +166,30 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
         <label className={label}>Senarai bahan (satu per baris)</label>
         <textarea className={input + " h-32"} value={matText} onChange={(e) => setMatText(e.target.value)} placeholder={"Laminat E0\nAcrylic\n4G / 5G Glass"} />
         <p className="mt-1 text-xs text-ink/40">Chip bahan di section &quot;Bahan &amp; Kemasan&quot;. Satu bahan satu baris.</p>
+      </div>
+
+      <div className="mt-5">
+        <div className={label}>Cara ia berfungsi (4 langkah)</div>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+          {c.processSteps.map((s, i) => (
+            <div key={i} className="space-y-2 rounded-lg border border-ink/10 p-3">
+              <div className="text-xs text-ink/40">Langkah {i + 1}</div>
+              <input className={input} placeholder="Tajuk langkah" value={s.t} onChange={(e) => setStep(i, "t", e.target.value)} />
+              <textarea className={input + " h-16"} placeholder="Penerangan" value={s.d} onChange={(e) => setStep(i, "d", e.target.value)} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <label className={label}>Tajuk CTA (bahagian bawah homepage)</label>
+          <input className={input} value={c.ctaTitle} onChange={(e) => setField("ctaTitle", e.target.value)} />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={label}>Teks CTA</label>
+          <textarea className={input + " h-16"} value={c.ctaText} onChange={(e) => setField("ctaText", e.target.value)} />
+        </div>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">

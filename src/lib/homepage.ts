@@ -17,6 +17,9 @@ export interface HomepageConfig {
   showroomAddress: string;
   serviceImages: { dapur: string; wardrobe: string; tv: string; panel: string }; // gambar 4 tile perkhidmatan
   materialChips: string[]; // senarai bahan (chip) di homepage
+  processSteps: { t: string; d: string }[]; // 4 langkah "Cara ia berfungsi"
+  ctaTitle: string;
+  ctaText: string;
 }
 
 export const DEFAULT_HOMEPAGE: HomepageConfig = {
@@ -41,4 +44,12 @@ export const DEFAULT_HOMEPAGE: HomepageConfig = {
     panel: "https://images.unsplash.com/photo-1615529182904-14819c35db37?w=800&q=80",
   },
   materialChips: ["Laminat E0", "Acrylic", "4G / 5G Glass", "Sintered Stone", "Veneer", "Quartz", "Fluted Panel", "Aluminium"],
+  processSteps: [
+    { t: "Enquiry", d: "Isi sebut harga atau WhatsApp kami. Dapat anggaran serta-merta." },
+    { t: "Ukur Tapak", d: "Kami datang ukur & bincang reka bentuk di rumah anda." },
+    { t: "Reka & Sebut Harga", d: "Design + sebut harga tepat mengikut ukuran & bahan." },
+    { t: "Fabrikasi & Pasang", d: "Dibuat di workshop kami, dipasang kemas & tepat masa." },
+  ],
+  ctaTitle: "Dapatkan anggaran harga dalam 2 minit",
+  ctaText: "Jawab beberapa soalan ringkas, terus dapat julat harga & jadualkan ukur tapak percuma.",
 };

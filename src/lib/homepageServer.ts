@@ -39,6 +39,9 @@ export async function loadHomepageConfig(orgId?: string | null, isDefault = fals
           panel: cfg.serviceImages?.panel || base.serviceImages.panel,
         },
         materialChips: Array.isArray(cfg.materialChips) && cfg.materialChips.length ? cfg.materialChips : base.materialChips,
+        processSteps: Array.isArray(cfg.processSteps) && cfg.processSteps.length ? cfg.processSteps.map((s) => ({ t: String(s?.t || ""), d: String(s?.d || "") })) : base.processSteps,
+        ctaTitle: cfg.ctaTitle || base.ctaTitle,
+        ctaText: cfg.ctaText || base.ctaText,
       };
     }
   } catch {

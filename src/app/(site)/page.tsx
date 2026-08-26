@@ -10,13 +10,6 @@ import { loadHomepageConfig } from "@/lib/homepageServer";
 
 export const dynamic = "force-dynamic";
 
-const STEPS = [
-  { n: "01", t: "Enquiry", d: "Isi sebut harga atau WhatsApp kami. Dapat anggaran serta-merta." },
-  { n: "02", t: "Ukur Tapak", d: "Kami datang ukur & bincang reka bentuk di rumah anda." },
-  { n: "03", t: "Reka & Sebut Harga", d: "Design + sebut harga tepat mengikut ukuran & bahan." },
-  { n: "04", t: "Fabrikasi & Pasang", d: "Dibuat di workshop kami, dipasang kemas & tepat masa." },
-];
-
 const TESTIMONIALS = [
   { name: "Puan Aina", area: "Damansara", text: "Kabinet dapur kami nampak mewah tapi harga berpatutan. Pemasangan kemas & tepat masa." },
   { name: "Encik Faiz", area: "Shah Alam", text: "Dari design sampai siap semua smooth. Wardrobe walk-in memang jadi macam gambar." },
@@ -77,9 +70,9 @@ export default async function HomePage() {
           <p className="eyebrow text-brass-lite">Prosesnya mudah</p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-tan">Cara ia berfungsi</h2>
           <div className="mt-10 grid gap-8 md:grid-cols-4">
-            {STEPS.map((s) => (
-              <div key={s.n}>
-                <div className="font-serif text-4xl italic text-brass">{s.n}</div>
+            {hp.processSteps.map((s, i) => (
+              <div key={i}>
+                <div className="font-serif text-4xl italic text-brass">{String(i + 1).padStart(2, "0")}</div>
                 <h3 className="mt-2 font-display text-lg font-semibold text-off-white">{s.t}</h3>
                 <p className="mt-2 text-sm text-white/65">{s.d}</p>
               </div>
@@ -145,10 +138,10 @@ export default async function HomePage() {
       <section className="bg-brass">
         <div className="container-c flex flex-col items-center gap-6 py-16 text-center">
           <h2 className="max-w-2xl font-display text-3xl font-semibold text-ink">
-            Dapatkan anggaran harga dalam 2 minit
+            {hp.ctaTitle}
           </h2>
           <p className="max-w-lg text-ink/75">
-            Jawab beberapa soalan ringkas, terus dapat julat harga & jadualkan ukur tapak percuma.
+            {hp.ctaText}
           </p>
           <Link href="/sebut-harga" className="rounded-lg bg-ink px-8 py-4 font-semibold text-off-white transition hover:bg-ink-soft">
             Mula Sebut Harga →
