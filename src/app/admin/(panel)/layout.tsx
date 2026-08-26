@@ -3,18 +3,20 @@ import { requireStaff } from "@/lib/supabaseServer";
 import { signOut } from "../auth-actions";
 import AdminNav from "@/components/admin/AdminNav";
 import Logo from "@/components/Logo";
+import { tenantBrand } from "@/lib/branding";
 
 export const dynamic = "force-dynamic";
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const staff = await requireStaff();
+  const brand = await tenantBrand(staff.orgId);
   return (
     <div className="min-h-screen bg-paper">
       {/* Sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col bg-ink p-4 text-white md:flex print:!hidden">
         <Link href="/admin" className="mb-6 flex items-center gap-2 px-1">
-          <Logo className="h-9 w-9" />
-          <span className="font-display text-sm font-semibold tracking-widest text-tan">ADMIN</span>
+          <Logo src={brand.logoUrl} alt={brand.nama} className="h-9 w-9" />
+          <span className="font-display text-sm font-semibold tracking-widest text-tan">{brand.nama}</span>
         </Link>
         <AdminNav />
         <div className="mt-auto border-t border-ink-line pt-3">
@@ -30,8 +32,8 @@ export default async function PanelLayout({ children }: { children: React.ReactN
 
       {/* Mobile top bar */}
       <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-ink/10 bg-ink px-4 py-3 text-white md:hidden print:!hidden">
-        <Logo className="h-8 w-8" />
-        <span className="font-display text-sm tracking-widest text-tan">ADMIN</span>
+        <Logo src={brand.logoUrl} alt={brand.nama} className="h-8 w-8" />
+        <span className="font-display text-sm tracking-widest text-tan">{brand.nama}</span>
         <form action={signOut} className="ml-auto">
           <button className="text-sm text-white/70">Keluar</button>
         </form>

@@ -80,6 +80,7 @@ export interface CustomerContext {
   customerId: string;
   emel: string;
   nama: string;
+  orgId: string | null;
 }
 
 /** Pastikan pengguna log masuk & pelanggan (ada customer_id). Redirect ke /portal/login jika tidak. */
@@ -92,7 +93,7 @@ export async function requireCustomer(): Promise<CustomerContext> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("nama, emel, customer_id")
+    .select("nama, emel, customer_id, org_id")
     .eq("id", user.id)
     .single();
 
@@ -103,6 +104,7 @@ export async function requireCustomer(): Promise<CustomerContext> {
     customerId: profile.customer_id as string,
     emel: profile.emel || user.email || "",
     nama: profile.nama || user.email || "Pelanggan",
+    orgId: (profile.org_id as string) || null,
   };
 }
 
