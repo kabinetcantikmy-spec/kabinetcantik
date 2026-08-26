@@ -8,6 +8,7 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
+  const [matText, setMatText] = useState(initial.materialChips.join("\n"));
 
   function setField<K extends keyof HomepageConfig>(k: K, v: HomepageConfig[K]) {
     setC((prev) => ({ ...prev, [k]: v }));
@@ -39,11 +40,32 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
     }
   }
 
+  async function onSvcImg(e: React.ChangeEvent<HTMLInputElement>, key: "dapur" | "wardrobe" | "tv" | "panel") {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setUploading("svc-" + key);
+    setMsg(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", f);
+      fd.append("slot", "svc-" + key);
+      const res = await uploadHomepageImage(fd);
+      if (!res.ok || !res.url) throw new Error(res.error || "gagal");
+      const url = res.url;
+      setC((prev) => ({ ...prev, serviceImages: { ...prev.serviceImages, [key]: url } }));
+    } catch (err) {
+      setMsg({ ok: false, text: err instanceof Error ? err.message : "Muat naik imej gagal. Cuba imej lain (PNG/JPG)." });
+    } finally {
+      setUploading(null);
+    }
+  }
+
   async function save() {
     setBusy(true);
     setMsg(null);
     try {
-      const res = await saveHomepageConfig(c);
+      const materialChips = matText.split(/[\n,]/).map((x) => x.trim()).filter(Boolean);
+      const res = await saveHomepageConfig({ ...c, materialChips });
       setMsg(res.ok ? { ok: true, text: "Disimpan. Laman awam dikemas kini." } : { ok: false, text: res.error || "Gagal simpan." });
     } catch {
       setMsg({ ok: false, text: "Ada masalah. Cuba lagi." });
@@ -107,6 +129,35 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="mt-5">
+        <div className={label}>Gambar Perkhidmatan (4 tile)</div>
+        <p className="mt-1 text-xs text-ink/40">Gambar untuk 4 kategori di section &quot;Apa yang kami reka&quot;.</p>
+        <div className="mt-2 grid gap-3 sm:grid-cols-4">
+          {([
+            { key: "dapur", title: "Kabinet Dapur" },
+            { key: "wardrobe", title: "Wardrobe" },
+            { key: "tv", title: "TV Cabinet" },
+            { key: "panel", title: "Wall Panelling" },
+          ] as const).map((it) => (
+            <div key={it.key} className="space-y-2 rounded-lg border border-ink/10 p-3">
+              <div className={label}>{it.title}</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={c.serviceImages[it.key]} alt={it.title} className="aspect-[3/4] w-full rounded border border-ink/10 object-cover" />
+              <label className="block cursor-pointer rounded-lg border border-ink/15 px-3 py-2 text-center text-xs hover:bg-paper">
+                {uploading === "svc-" + it.key ? "Memuat naik…" : "Tukar gambar"}
+                <input type="file" accept="image/*" className="hidden" disabled={uploading !== null} onChange={(e) => onSvcImg(e, it.key)} />
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-5">
+        <label className={label}>Senarai bahan (satu per baris)</label>
+        <textarea className={input + " h-32"} value={matText} onChange={(e) => setMatText(e.target.value)} placeholder={"Laminat E0\nAcrylic\n4G / 5G Glass"} />
+        <p className="mt-1 text-xs text-ink/40">Chip bahan di section &quot;Bahan &amp; Kemasan&quot;. Satu bahan satu baris.</p>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">

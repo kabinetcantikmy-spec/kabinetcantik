@@ -107,7 +107,7 @@ export async function uploadHomepageImage(formData: FormData): Promise<{ ok: boo
   if (!staff.orgId) return { ok: false, error: "Tiada org untuk akaun ini." };
   const file = formData.get("file");
   const slotRaw = String(formData.get("slot") || "hero");
-  const slot = ["hero", "before", "after"].includes(slotRaw) ? slotRaw : "hero";
+  const slot = slotRaw.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 24) || "hero";
   if (!(file instanceof File) || file.size === 0) return { ok: false, error: "Tiada fail dipilih." };
   if (file.size > 5 * 1024 * 1024) return { ok: false, error: "Saiz imej maksimum 5MB." };
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";

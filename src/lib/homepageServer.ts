@@ -32,6 +32,13 @@ export async function loadHomepageConfig(orgId?: string | null, isDefault = fals
         whatsapp: typeof cfg.whatsapp === "string" ? cfg.whatsapp : base.whatsapp,
         serviceArea: cfg.serviceArea || base.serviceArea,
         showroomAddress: typeof cfg.showroomAddress === "string" ? cfg.showroomAddress : base.showroomAddress,
+        serviceImages: {
+          dapur: cfg.serviceImages?.dapur || base.serviceImages.dapur,
+          wardrobe: cfg.serviceImages?.wardrobe || base.serviceImages.wardrobe,
+          tv: cfg.serviceImages?.tv || base.serviceImages.tv,
+          panel: cfg.serviceImages?.panel || base.serviceImages.panel,
+        },
+        materialChips: Array.isArray(cfg.materialChips) && cfg.materialChips.length ? cfg.materialChips : base.materialChips,
       };
     }
   } catch {

@@ -2,14 +2,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { BLUR } from "@/lib/img";
 
-const TILES = [
-  { key: "dapur", label: "Kabinet Dapur", img: "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&q=80" },
-  { key: "wardrobe", label: "Wardrobe", img: "https://images.unsplash.com/photo-1558997519-83ea9252edf8?w=800&q=80" },
-  { key: "tv", label: "TV Cabinet", img: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80" },
-  { key: "panel", label: "Wall Panelling", img: "https://images.unsplash.com/photo-1615529182904-14819c35db37?w=800&q=80" },
-];
+const DEFAULT_IMG = {
+  dapur: "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&q=80",
+  wardrobe: "https://images.unsplash.com/photo-1558997519-83ea9252edf8?w=800&q=80",
+  tv: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80",
+  panel: "https://images.unsplash.com/photo-1615529182904-14819c35db37?w=800&q=80",
+};
 
-export default function CategoryTiles() {
+type TileImages = { dapur?: string; wardrobe?: string; tv?: string; panel?: string };
+
+export default function CategoryTiles({ images }: { images?: TileImages }) {
+  const TILES = [
+    { key: "dapur", label: "Kabinet Dapur", img: images?.dapur || DEFAULT_IMG.dapur },
+    { key: "wardrobe", label: "Wardrobe", img: images?.wardrobe || DEFAULT_IMG.wardrobe },
+    { key: "tv", label: "TV Cabinet", img: images?.tv || DEFAULT_IMG.tv },
+    { key: "panel", label: "Wall Panelling", img: images?.panel || DEFAULT_IMG.panel },
+  ];
   return (
     <section id="perkhidmatan" className="container-c py-20">
       <p className="eyebrow">Perkhidmatan</p>

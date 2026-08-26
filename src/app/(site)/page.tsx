@@ -17,8 +17,6 @@ const STEPS = [
   { n: "04", t: "Fabrikasi & Pasang", d: "Dibuat di workshop kami, dipasang kemas & tepat masa." },
 ];
 
-const MATERIALS = ["Laminat E0", "Acrylic", "4G / 5G Glass", "Sintered Stone", "Veneer", "Quartz", "Fluted Panel", "Aluminium"];
-
 const TESTIMONIALS = [
   { name: "Puan Aina", area: "Damansara", text: "Kabinet dapur kami nampak mewah tapi harga berpatutan. Pemasangan kemas & tepat masa." },
   { name: "Encik Faiz", area: "Shah Alam", text: "Dari design sampai siap semua smooth. Wardrobe walk-in memang jadi macam gambar." },
@@ -52,7 +50,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero hp={hp} />
-      <CategoryTiles />
+      <CategoryTiles images={hp.serviceImages} />
 
       {/* Featured portfolio */}
       <section className="container-c py-8">
@@ -95,7 +93,7 @@ export default async function HomePage() {
         <p className="eyebrow">Bahan & Kemasan</p>
         <h2 className="mt-2 h-display text-3xl">Kualiti & pilihan tanpa kompromi</h2>
         <div className="mt-8 flex flex-wrap gap-3">
-          {MATERIALS.map((m) => (
+          {hp.materialChips.filter(Boolean).map((m) => (
             <span key={m} className="rounded-full border border-ink/15 bg-white px-5 py-2.5 text-sm text-ink/80">
               {m}
             </span>
