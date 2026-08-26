@@ -68,3 +68,15 @@ export async function currentOrg(): Promise<{ orgId: string | null; isDefault: b
   const orgId = await resolveOrgId(host);
   return { orgId, isDefault };
 }
+
+/** Base URL ikut host request (domain tenant sebenar). Fallback ke env.
+ *  Guna untuk semua pautan customer-facing (invite portal, magic-link, sebut harga, ulasan). */
+export async function tenantBaseUrl(): Promise<string> {
+  try {
+    const host = (await headers()).get("host");
+    if (host) return `${host.includes("localhost") ? "http" : "https"}://${host}`;
+  } catch {
+    /* ignore */
+  }
+  return process.env.NEXT_PUBLIC_APP_URL || "https://kabinetcantik.com";
+}

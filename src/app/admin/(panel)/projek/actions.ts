@@ -4,6 +4,7 @@ import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { requireStaff, createSupabaseServer } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
 import { tenantBrand } from "@/lib/branding";
+import { tenantBaseUrl } from "@/lib/tenant";
 import { waLink } from "@/lib/wa";
 import { waReview } from "@/lib/whatsapp";
 import { revalidatePath } from "next/cache";
@@ -61,26 +62,42 @@ export async function createProjectFromQuote(quotationId: string): Promise<Res> 
 
   if (q.lead_id) await sb.from("leads").update({ stage: "Deposit" }).eq("id", q.lead_id);
 
-  // Auto-jemput akaun pelanggan (portal) jika ada emel
+  // Auto-jemput akaun pelanggan (portal) jika ada emel — tenant-branded via Resend.
   if (customerId && lead?.emel) {
     try {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
       const admin = createServiceClient();
-      const { data: invited, error: invErr } = await admin.auth.admin.inviteUserByEmail(lead.emel, {
-        redirectTo: `${appUrl}/auth/callback?next=/portal`,
-      });
-      if (!invErr && invited?.user) {
+      // Pastikan akaun auth pelanggan wujud (email disahkan, tiada kata laluan lagi).
+      await admin.auth.admin.createUser({ email: lead.emel, email_confirm: true }).catch(() => {});
+      // Jana pautan log masuk portal (token_hash → /auth/callback).
+      const { data: gl } = await admin.auth.admin.generateLink({ type: "magiclink", email: lead.emel });
+      const uid = gl?.user?.id;
+      const th = gl?.properties?.hashed_token;
+      if (uid) {
         await admin.from("profiles").upsert({
-          id: invited.user.id,
-          nama: lead.nama,
-          emel: lead.emel,
-          role: "customer",
-          customer_id: customerId,
-          org_id: staff.orgId,
+          id: uid, nama: lead.nama, emel: lead.emel,
+          role: "customer", customer_id: customerId, org_id: staff.orgId,
+        });
+      }
+      if (th) {
+        const brand = await tenantBrand(staff.orgId);
+        const baseUrl = await tenantBaseUrl();
+        const link = `${baseUrl}/auth/callback?token_hash=${encodeURIComponent(th)}&type=magiclink&next=/portal`;
+        await sendEmail({
+          to: lead.emel,
+          fromName: brand.nama,
+          subject: `Portal projek anda dah sedia — ${brand.nama}`,
+          html: emailShell(
+            "Selamat datang ke portal projek anda",
+            `<p>Hai ${lead.nama || ""}, projek anda dengan <b>${brand.nama}</b> telah dimulakan.</p>
+             <p>Pantau status projek, reka bentuk, bayaran &amp; warranti di portal pelanggan anda:</p>
+             <p style="margin:20px 0"><a href="${link}" style="background:#AE873B;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;display:inline-block">Masuk Portal Saya</a></p>
+             <p style="font-size:13px;color:#9a9a9a">Butang tak jadi? Salin pautan ni ke pelayar:<br>${link}</p>`,
+            brand.nama
+          ),
         });
       }
     } catch {
-      // Jemputan gagal (cth user sudah wujud) — jangan gagalkan penciptaan projek.
+      // Jangan gagalkan penciptaan projek jika emel/jemputan gagal.
     }
   }
 
@@ -139,8 +156,8 @@ export async function requestReview(projectId: string): Promise<Res> {
   const token = proj.review_token || crypto.randomUUID();
   await sb.from("projects").update({ review_token: token }).eq("id", projectId);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const link = `${appUrl}/ulasan/baru/${token}`;
+  const baseUrl = await tenantBaseUrl();
+  const link = `${baseUrl}/ulasan/baru/${token}`;
   const msg = `Hai ${cust?.nama || ""}, terima kasih memilih ${brand.nama}! Kongsi pengalaman anda di sini: ${link}`;
 
   if (cust?.emel) {

@@ -4,6 +4,7 @@ import { supabaseReady } from "@/lib/supabase";
 import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
 import { tenantBrand } from "@/lib/branding";
+import { tenantBaseUrl } from "@/lib/tenant";
 import { planForOrg } from "@/lib/planServer";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import { waLink } from "@/lib/wa";
@@ -175,8 +176,8 @@ export async function sendQuotation(quotationId: string): Promise<Res> {
   const token = q.share_token || crypto.randomUUID();
   await sb.from("quotations").update({ share_token: token, status: q.status === "draft" ? "sent" : q.status }).eq("id", quotationId);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const link = `${appUrl}/q/${token}`;
+  const baseUrl = await tenantBaseUrl();
+  const link = `${baseUrl}/q/${token}`;
   const msg = `Hai ${lead?.nama || ""}, sebut harga ${q.no_quote} (${rm2(Number(q.jumlah))}) anda sedia. Lihat & terima di sini: ${link}`;
 
   if (lead?.emel) {

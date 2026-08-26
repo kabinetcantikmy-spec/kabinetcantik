@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowser } from "@/lib/supabaseBrowser";
+import { sendPortalMagicLink } from "../auth-actions";
 import Logo from "@/components/Logo";
 
 export default function PortalLoginForm({ brand }: { brand: { nama: string; logoUrl: string } }) {
@@ -34,12 +35,8 @@ export default function PortalLoginForm({ brand }: { brand: { nama: string; logo
     if (!emel) { setErr("Masukkan emel dahulu."); return; }
     setBusy(true);
     try {
-      const supabase = createSupabaseBrowser();
-      const { error } = await supabase.auth.signInWithOtp({
-        email: emel,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/portal` },
-      });
-      if (error) throw error;
+      const res = await sendPortalMagicLink(emel);
+      if (!res.ok) throw new Error(res.error || "Gagal menghantar pautan.");
       setOtpSent(true);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "Gagal menghantar pautan.");
