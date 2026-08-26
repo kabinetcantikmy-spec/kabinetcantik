@@ -52,7 +52,7 @@ export async function bookSiteVisit(input: {
 
   if (emel) {
     await sendEmail({
-      to: input.emel,
+      to: emel,
       fromName: brand.nama,
       subject: `Permohonan ukur tapak diterima — ${brand.nama}`,
       html: emailShell(
