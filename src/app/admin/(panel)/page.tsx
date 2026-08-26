@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { supabaseReady } from "@/lib/supabase";
 import { createSupabaseServer } from "@/lib/supabaseServer";
 import { STAGES, STAGE_ACCENT, LOST } from "@/lib/crm";
 import { rm } from "@/lib/format";
+import { loadOnboarding } from "@/lib/onboardingServer";
+import { SETUP_STEPS } from "@/lib/onboarding";
 
 export const dynamic = "force-dynamic";
 
@@ -64,9 +67,20 @@ function Tile({ label, value, sub }: { label: string; value: string; sub?: strin
 
 export default async function Dashboard() {
   const stats = await getStats();
+  const onboarding = await loadOnboarding();
+  const setupDone = SETUP_STEPS.filter((x) => onboarding.steps[x.key]).length;
 
   return (
     <div>
+      {!onboarding.done && (
+        <Link href="/admin/setup" className="mb-5 flex items-center justify-between gap-4 rounded-2xl border border-brass/40 bg-brass/5 px-5 py-4 transition hover:border-brass">
+          <div>
+            <div className="font-display text-lg font-semibold text-ink">🏗️ Siapkan kedai anda</div>
+            <div className="mt-0.5 text-sm text-ink/60">Lengkapkan setup — {setupDone}/{SETUP_STEPS.length} langkah selesai.</div>
+          </div>
+          <span className="whitespace-nowrap rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-off-white">Teruskan setup →</span>
+        </Link>
+      )}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="h-display text-2xl">Dashboard</h1>
