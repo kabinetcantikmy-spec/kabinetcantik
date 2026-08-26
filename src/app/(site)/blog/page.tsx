@@ -7,7 +7,7 @@ import { fmtDate } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Blog — Idea Reka Bentuk Dapur & Kabinet | KabinetCantik",
+  title: "Blog — Idea Reka Bentuk Dapur & Kabinet",
   description: "Tip, idea & panduan reka bentuk kabinet dapur, wardrobe dan ruang tamu untuk rumah di Klang Valley.",
 };
 

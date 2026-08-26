@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import BookVisitForm from "@/components/BookVisitForm";
 
 export const metadata: Metadata = {
-  title: "Tempah Ukur Tapak Percuma | KabinetCantik",
+  title: "Tempah Ukur Tapak Percuma",
   description: "Tempah sesi ukur tapak percuma untuk projek kabinet dapur atau wardrobe anda di Klang Valley.",
 };
 

@@ -7,7 +7,7 @@ import { currentOrg } from "@/lib/tenant";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Portfolio — Projek Kabinet Kustom | KabinetCantik",
+  title: "Portfolio — Projek Kabinet Kustom",
   description: "Lihat koleksi projek kabinet dapur, wardrobe, TV cabinet dan wall panelling kami di Klang Valley.",
 };
 

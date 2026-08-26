@@ -127,7 +127,7 @@ export default async function HomePage() {
       <section className="bg-white py-20">
         <div className="container-c">
           <p className="eyebrow">Ulasan Pelanggan</p>
-          <h2 className="mt-2 h-display text-3xl">Dipercayai keluarga Klang Valley</h2>
+          <h2 className="mt-2 h-display text-3xl">Dipercayai keluarga {hp.serviceArea}</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {testimonials.map((t, i) => (
               <figure key={i} className="rounded-xl border border-ink/10 bg-paper p-6">

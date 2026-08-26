@@ -14,8 +14,8 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(props: { params: Promise<{ kategori: string }> }): Promise<Metadata> {
   const params = await props.params;
   const s = SERVICES.find((x) => x.slug === params.kategori);
-  if (!s) return { title: "Perkhidmatan | KabinetCantik" };
-  return { title: `${s.nama} Kustom Klang Valley | KabinetCantik`, description: s.ringkas };
+  if (!s) return { title: "Perkhidmatan" };
+  return { title: `${s.nama} Kustom Klang Valley`, description: s.ringkas };
 }
 
 export default async function ServiceCategory(props: { params: Promise<{ kategori: string }> }) {

@@ -2,7 +2,7 @@ import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import PublicReviewForm from "@/components/PublicReviewForm";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Tulis Ulasan | KabinetCantik", robots: { index: false } };
+export const metadata = { title: "Tulis Ulasan", robots: { index: false } };
 
 export default async function TulisUlasan(props: { params: Promise<{ token: string }> }) {
   const params = await props.params;

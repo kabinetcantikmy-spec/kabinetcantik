@@ -4,7 +4,7 @@ import Image from "next/image";
 import { BLUR } from "@/lib/img";
 
 export const metadata: Metadata = {
-  title: "Bahan & Kemasan | KabinetCantik",
+  title: "Bahan & Kemasan",
   description: "Pilihan bahan & kemasan kabinet KabinetCantik — laminat, acrylic, 4G/5G glass, sintered stone, veneer dan lebih.",
 };
 

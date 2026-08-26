@@ -1,4 +1,4 @@
-export const metadata = { title: "Terma & Syarat | KabinetCantik" };
+export const metadata = { title: "Terma & Syarat" };
 
 export default function TermaPage() {
   return (

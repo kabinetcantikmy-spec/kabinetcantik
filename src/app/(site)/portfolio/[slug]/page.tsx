@@ -13,9 +13,9 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   const params = await props.params;
   const { orgId, isDefault } = await currentOrg();
   const p = await getProjectBySlug(params.slug, orgId, isDefault);
-  if (!p) return { title: "Projek tidak dijumpai | KabinetCantik" };
+  if (!p) return { title: "Projek tidak dijumpai" };
   return {
-    title: `${p.tajuk} — ${CATEGORY_LABELS[p.kategori]} | KabinetCantik`,
+    title: `${p.tajuk} — ${CATEGORY_LABELS[p.kategori]}`,
     description: p.keterangan || `Projek ${CATEGORY_LABELS[p.kategori]} di ${p.kawasan}.`,
     openGraph: { title: p.tajuk, description: p.keterangan, images: p.cover ? [p.cover] : undefined },
   };

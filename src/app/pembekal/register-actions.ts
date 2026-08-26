@@ -25,7 +25,8 @@ export async function registerSupplier(input: {
   if (input.password.length < 6) return { ok: false, error: "Kata laluan minimum 6 aksara." };
 
   const sb = createServiceClient();
-  const brand = await tenantBrand(await resolveOrgId((await headers()).get("host")));
+  const orgId = await resolveOrgId((await headers()).get("host"));
+  const brand = await tenantBrand(orgId);
 
   // 1) Cipta akaun auth
   const { data: created, error: authErr } = await sb.auth.admin.createUser({
@@ -41,6 +42,7 @@ export async function registerSupplier(input: {
   const { data: sup, error: supErr } = await sb
     .from("suppliers")
     .insert({
+      org_id: orgId,
       nama: input.nama.trim(),
       syarikat: input.syarikat || null,
       no_ssm: input.no_ssm || null,
@@ -62,6 +64,7 @@ export async function registerSupplier(input: {
     emel: input.emel.trim(),
     role: "supplier",
     supplier_id: sup.id,
+    org_id: orgId,
   });
 
   // 4) Emel pengesahan

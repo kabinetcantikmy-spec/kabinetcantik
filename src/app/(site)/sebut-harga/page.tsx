@@ -7,7 +7,7 @@ import { resolveOrgId } from "@/lib/tenant";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Sebut Harga Percuma — Anggaran dalam 2 Minit | KabinetCantik",
+  title: "Sebut Harga Percuma — Anggaran dalam 2 Minit",
   description: "Jawab beberapa soalan ringkas dan dapatkan anggaran harga kabinet kustom anda serta-merta.",
 };
 

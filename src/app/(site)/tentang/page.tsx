@@ -4,7 +4,7 @@ import Image from "next/image";
 import { BLUR } from "@/lib/img";
 
 export const metadata: Metadata = {
-  title: "Tentang Kami | KabinetCantik",
+  title: "Tentang Kami",
   description: "KabinetCantik — studio reka bentuk & workshop kabinet kustom di Klang Valley. Kenali kisah & proses kami.",
 };
 

@@ -5,7 +5,7 @@ import { SERVICES } from "@/data/services";
 import { BLUR } from "@/lib/img";
 
 export const metadata: Metadata = {
-  title: "Perkhidmatan — Kabinet Dapur, Wardrobe & Lain-lain | KabinetCantik",
+  title: "Perkhidmatan — Kabinet Dapur, Wardrobe & Lain-lain",
   description: "Perkhidmatan reka bentuk & fabrikasi kabinet kustom KabinetCantik: dapur, wardrobe, TV cabinet, wall panelling di Klang Valley.",
 };
 

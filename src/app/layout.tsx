@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { hostBrand } from "@/lib/branding";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "KabinetCantik — Kabinet Dapur, Wardrobe & Kabinet Kustom | Klang Valley",
-  description:
-    "Reka bentuk & fabrikasi kabinet dapur, wardrobe, TV cabinet dan wall panelling kustom di Klang Valley. Dapatkan sebut harga percuma dalam 2 minit.",
-  openGraph: {
-    title: "KabinetCantik — Dapur impian, direka khas untuk anda",
-    description: "Kabinet kustom premium untuk rumah anda. Klang Valley.",
-    type: "website",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await hostBrand((await headers()).get("host"));
+  const nama = brand.nama;
+  return {
+    title: { default: `${nama} — Kabinet Dapur, Wardrobe & Kabinet Kustom`, template: `%s | ${nama}` },
+    description:
+      "Reka bentuk & fabrikasi kabinet dapur, wardrobe, TV cabinet dan wall panelling kustom. Dapatkan sebut harga percuma dalam 2 minit.",
+    openGraph: {
+      title: `${nama} — Dapur impian, direka khas untuk anda`,
+      description: "Kabinet kustom premium untuk rumah anda.",
+      type: "website",
+    },
+  };
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

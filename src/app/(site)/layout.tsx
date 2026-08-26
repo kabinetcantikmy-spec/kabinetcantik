@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { hostBrand } from "@/lib/branding";
 import { currentOrg } from "@/lib/tenant";
 import { loadHomepageConfig } from "@/lib/homepageServer";
@@ -11,10 +12,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const host = (await headers()).get("host");
   const brand = await hostBrand(host);
   const { orgId, isDefault } = await currentOrg();
+  // Subdomain tak berdaftar → 404 (elak papar kandungan semua tenant).
+  if (!isDefault && !orgId) notFound();
   const hp = await loadHomepageConfig(orgId, isDefault);
   return (
     <>
-      <JsonLd data={localBusinessLd()} />
+      <JsonLd data={localBusinessLd(brand.nama, hp.serviceArea)} />
       <Header brand={brand} />
       <main>{children}</main>
       <Footer brand={brand} area={hp.serviceArea} address={hp.showroomAddress} tagline={hp.heroTagline} />

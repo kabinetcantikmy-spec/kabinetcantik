@@ -3,6 +3,7 @@ import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { waSalesLink } from "@/lib/wa";
 import { waLeadWelcome } from "@/lib/whatsapp";
 import { resolveOrgId } from "@/lib/tenant";
+import { tenantBrand } from "@/lib/branding";
 
 export const runtime = "nodejs";
 
@@ -98,8 +99,9 @@ export async function POST(req: NextRequest) {
 
   // Mesej WhatsApp untuk sales follow-up (satu-klik).
   const estText = est ? ` Anggaran: RM${est.low.toLocaleString()}–RM${est.high.toLocaleString()}.` : "";
+  const brand = await tenantBrand(orgId);
   const waLink = waSalesLink(
-    `Lead baru KabinetCantik:\nNama: ${nama}\nTel: ${telefon}\nKategori: ${(body.kategori || []).join(", ")}.${estText}`
+    `Lead baru ${brand.nama}:\nNama: ${nama}\nTel: ${telefon}\nKategori: ${(body.kategori || []).join(", ")}.${estText}`
   );
 
   return NextResponse.json({ ok: true, waLink });

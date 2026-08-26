@@ -6,6 +6,7 @@ import { Lead, LeadActivity } from "@/lib/crm";
 import { rm } from "@/lib/format";
 import { fmtDateTime, fmtDate } from "@/lib/format";
 import { waLink } from "@/lib/wa";
+import { tenantBrand } from "@/lib/branding";
 import ActivityForm from "@/components/admin/ActivityForm";
 import LeadControls from "@/components/admin/LeadControls";
 
@@ -18,6 +19,7 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
   }
   const sb = createSupabaseServer();
   const { data: lead } = await sb.from("leads").select("*").eq("id", params.id).single();
+  const brand = await tenantBrand((lead as { org_id?: string } | null)?.org_id);
   if (!lead) notFound();
   const l = lead as Lead;
 
@@ -70,7 +72,7 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
     : [];
   const SOURCE_LABEL: Record<string, string> = { quote_wizard: "Website", website: "Website", manual: "Manual" };
   const sumberText = SOURCE_LABEL[l.source as string] || (l.source ? String(l.source) : "—");
-  const wa = waLink(l.telefon, `Hai ${l.nama}, terima kasih hubungi KabinetCantik.`);
+  const wa = waLink(l.telefon, `Hai ${l.nama}, terima kasih hubungi ${brand.nama}.`);
 
   return (
     <div>

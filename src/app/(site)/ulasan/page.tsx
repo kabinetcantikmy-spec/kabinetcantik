@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { currentOrg } from "@/lib/tenant";
+import { tenantBrand } from "@/lib/branding";
 import JsonLd from "@/components/JsonLd";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Ulasan Pelanggan | KabinetCantik",
+  title: "Ulasan Pelanggan",
   description: "Apa kata pelanggan KabinetCantik tentang projek kabinet dapur & wardrobe mereka.",
 };
 
@@ -19,6 +20,7 @@ interface Review {
 
 export default async function UlasanPage() {
   const { orgId } = await currentOrg();
+  const brand = await tenantBrand(orgId);
   let reviews: Review[] = [];
   if (supabaseReady()) {
     const sb = createServiceClient();
@@ -33,7 +35,7 @@ export default async function UlasanPage() {
     ? {
         "@context": "https://schema.org",
         "@type": "Product",
-        name: "Kabinet Kustom KabinetCantik",
+        name: `Kabinet Kustom ${brand.nama}`,
         aggregateRating: {
           "@type": "AggregateRating",
           ratingValue: avg.toFixed(1),

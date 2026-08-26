@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { currentOrg } from "@/lib/tenant";
+import { tenantBrand } from "@/lib/branding";
 import { fmtDate } from "@/lib/format";
 import JsonLd from "@/components/JsonLd";
 
@@ -31,9 +32,9 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   const params = await props.params;
   const { orgId } = await currentOrg();
   const post = await getPost(params.slug, orgId);
-  if (!post) return { title: "Artikel tidak dijumpai | KabinetCantik" };
+  if (!post) return { title: "Artikel tidak dijumpai" };
   return {
-    title: `${post.tajuk} | KabinetCantik`,
+    title: `${post.tajuk}`,
     description: post.ringkasan || undefined,
     openGraph: { title: post.tajuk, description: post.ringkasan || undefined, images: post.cover_url ? [post.cover_url] : undefined, type: "article" },
   };
@@ -44,6 +45,7 @@ export default async function BlogPost(props: { params: Promise<{ slug: string }
   const { orgId } = await currentOrg();
   const post = await getPost(params.slug, orgId);
   if (!post) notFound();
+  const brand = await tenantBrand(orgId);
 
   const base = process.env.NEXT_PUBLIC_APP_URL || "https://kabinetcantik.com";
   const articleLd = {
@@ -53,8 +55,8 @@ export default async function BlogPost(props: { params: Promise<{ slug: string }
     description: post.ringkasan || undefined,
     image: post.cover_url || undefined,
     datePublished: post.created_at,
-    author: { "@type": "Organization", name: "KabinetCantik" },
-    publisher: { "@type": "Organization", name: "KabinetCantik" },
+    author: { "@type": "Organization", name: brand.nama },
+    publisher: { "@type": "Organization", name: brand.nama },
     mainEntityOfPage: `${base}/blog/${post.slug}`,
   };
 
