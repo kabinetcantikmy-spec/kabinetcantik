@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { waSalesLink } from "@/lib/wa";
 import { waLeadWelcome } from "@/lib/whatsapp";
+import { resolveOrgId } from "@/lib/tenant";
 
 export const runtime = "nodejs";
 
@@ -35,17 +36,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nama, telefon & emel wajib." }, { status: 422 });
   }
 
+  const orgId = await resolveOrgId(req.headers.get("host"));
+
   const est = body.estimate;
   const budgetMin = est?.low ?? null;
   const budgetMax = est?.high ?? null;
 
   // Simpan ke Supabase (jika dikonfigurasi). Kalau tak, teruskan supaya dev boleh test.
-  if (supabaseReady()) {
+  if (supabaseReady() && orgId) {
     try {
       const sb = createServiceClient();
       const { data: inserted, error } = await sb
         .from("leads")
         .insert({
+          org_id: orgId,
           nama,
           telefon,
           emel,
@@ -70,6 +74,7 @@ export async function POST(req: NextRequest) {
         .neq("id", inserted.id);
       if ((count || 0) > 0) {
         await sb.from("lead_activity").insert({
+          org_id: orgId,
           lead_id: inserted.id,
           jenis: "note",
           mesej: `⚠️ Kemungkinan duplikasi — ${count} lead lain dengan telefon sama dalam 30 hari.`,
@@ -79,7 +84,7 @@ export async function POST(req: NextRequest) {
       // Simpan gambar ruang (jika ada) ke lead_files
       if (Array.isArray(body.photos) && body.photos.length) {
         await sb.from("lead_files").insert(
-          body.photos.slice(0, 5).map((url) => ({ lead_id: inserted.id, url, jenis: "gambar_ruang" }))
+          body.photos.slice(0, 5).map((url) => ({ org_id: orgId, lead_id: inserted.id, url, jenis: "gambar_ruang" }))
         );
       }
 

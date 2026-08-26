@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import QuoteWizard from "@/components/QuoteWizard";
 import { loadPricingConfig } from "@/lib/pricingServer";
+import { headers } from "next/headers";
+import { resolveOrgId } from "@/lib/tenant";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,9 @@ export default async function SebutHargaPage(
   }
 ) {
   const searchParams = await props.searchParams;
-  const config = await loadPricingConfig();
+  const host = (await headers()).get("host");
+  const orgId = await resolveOrgId(host);
+  const config = await loadPricingConfig(orgId);
   return (
     <section className="container-c pb-10 pt-28">
       <p className="eyebrow">Sebut Harga</p>
