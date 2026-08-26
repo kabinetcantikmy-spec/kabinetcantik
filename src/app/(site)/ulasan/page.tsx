@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { currentOrg } from "@/lib/tenant";
 import JsonLd from "@/components/JsonLd";
 
 export const dynamic = "force-dynamic";
@@ -17,10 +18,13 @@ interface Review {
 }
 
 export default async function UlasanPage() {
+  const { orgId } = await currentOrg();
   let reviews: Review[] = [];
   if (supabaseReady()) {
     const sb = createServiceClient();
-    const { data } = await sb.from("reviews").select("id, nama, rating, ulasan").eq("diterbitkan", true).order("created_at", { ascending: false });
+    let q = sb.from("reviews").select("id, nama, rating, ulasan").eq("diterbitkan", true);
+    if (orgId) q = q.eq("org_id", orgId);
+    const { data } = await q.order("created_at", { ascending: false });
     reviews = (data || []) as Review[];
   }
 

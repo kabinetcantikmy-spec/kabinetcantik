@@ -5,6 +5,7 @@ import ProjectCard from "@/components/ProjectCard";
 import BeforeAfter from "@/components/BeforeAfter";
 import { getFeaturedProjects } from "@/lib/portfolioDb";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { currentOrg } from "@/lib/tenant";
 
 export const dynamic = "force-dynamic";
 
@@ -26,9 +27,10 @@ const TESTIMONIALS = [
 interface HomeReview { nama: string; rating: number; ulasan: string | null }
 
 export default async function HomePage() {
-  const featured = (await getFeaturedProjects()).slice(0, 6);
+  const { orgId, isDefault } = await currentOrg();
+  const featured = (await getFeaturedProjects(orgId, isDefault)).slice(0, 6);
 
-  let testimonials: { name: string; text: string; rating: number; area?: string }[] = TESTIMONIALS.map((t) => ({
+  let testimonials: { name: string; text: string; rating: number; area?: string }[] = (isDefault ? TESTIMONIALS : []).map((t) => ({
     name: t.name,
     text: t.text,
     rating: 5,
@@ -36,7 +38,9 @@ export default async function HomePage() {
   }));
   if (supabaseReady()) {
     const sb = createServiceClient();
-    const { data } = await sb.from("reviews").select("nama, rating, ulasan").eq("diterbitkan", true).order("created_at", { ascending: false }).limit(3);
+    let rq = sb.from("reviews").select("nama, rating, ulasan").eq("diterbitkan", true);
+    if (orgId) rq = rq.eq("org_id", orgId);
+    const { data } = await rq.order("created_at", { ascending: false }).limit(3);
     const rows = (data || []) as HomeReview[];
     if (rows.length) {
       testimonials = rows.map((r) => ({ name: r.nama, text: r.ulasan || "", rating: r.rating }));

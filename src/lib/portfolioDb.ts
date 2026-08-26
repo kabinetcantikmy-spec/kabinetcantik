@@ -41,17 +41,18 @@ interface DbRow {
   featured: boolean | null;
 }
 
-export async function getPublishedProjects(): Promise<PublicProject[]> {
-  if (!supabaseReady()) return fromStatic();
+export async function getPublishedProjects(orgId?: string | null, allowStatic = false): Promise<PublicProject[]> {
+  if (!supabaseReady()) return allowStatic ? fromStatic() : [];
   try {
     const sb = createServiceClient();
-    const { data } = await sb
+    let q = sb
       .from("portfolio")
       .select("slug, tajuk, kategori, gaya, cover_url, kawasan, bahan, keterangan, featured")
-      .eq("diterbitkan", true)
-      .order("created_at", { ascending: false });
+      .eq("diterbitkan", true);
+    if (orgId) q = q.eq("org_id", orgId);
+    const { data } = await q.order("created_at", { ascending: false });
     const rows = (data || []) as DbRow[];
-    if (!rows.length) return fromStatic();
+    if (!rows.length) return allowStatic ? fromStatic() : [];
     return rows.map((r) => ({
       slug: r.slug,
       tajuk: r.tajuk,
@@ -65,21 +66,22 @@ export async function getPublishedProjects(): Promise<PublicProject[]> {
       featured: Boolean(r.featured),
     }));
   } catch {
-    return fromStatic();
+    return allowStatic ? fromStatic() : [];
   }
 }
 
-export async function getProjectBySlug(slug: string): Promise<PublicProject | null> {
-  if (!supabaseReady()) return fromStatic().find((p) => p.slug === slug) || null;
+export async function getProjectBySlug(slug: string, orgId?: string | null, allowStatic = false): Promise<PublicProject | null> {
+  if (!supabaseReady()) return allowStatic ? (fromStatic().find((p) => p.slug === slug) || null) : null;
   try {
     const sb = createServiceClient();
-    const { data: r } = await sb
+    let q = sb
       .from("portfolio")
       .select("id, slug, tajuk, kategori, gaya, cover_url, kawasan, bahan, keterangan, featured")
       .eq("slug", slug)
-      .eq("diterbitkan", true)
-      .single();
-    if (!r) return fromStatic().find((p) => p.slug === slug) || null;
+      .eq("diterbitkan", true);
+    if (orgId) q = q.eq("org_id", orgId);
+    const { data: r } = await q.single();
+    if (!r) return allowStatic ? (fromStatic().find((p) => p.slug === slug) || null) : null;
     const row = r as DbRow & { id: string };
     const { data: imgs } = await sb.from("portfolio_images").select("url").eq("portfolio_id", row.id).order("urutan");
     const images = (imgs || []).map((i: { url: string }) => i.url);
@@ -96,12 +98,12 @@ export async function getProjectBySlug(slug: string): Promise<PublicProject | nu
       featured: Boolean(row.featured),
     };
   } catch {
-    return fromStatic().find((p) => p.slug === slug) || null;
+    return allowStatic ? (fromStatic().find((p) => p.slug === slug) || null) : null;
   }
 }
 
-export async function getFeaturedProjects(): Promise<PublicProject[]> {
-  const all = await getPublishedProjects();
+export async function getFeaturedProjects(orgId?: string | null, allowStatic = false): Promise<PublicProject[]> {
+  const all = await getPublishedProjects(orgId, allowStatic);
   const feat = all.filter((p) => p.featured);
   return feat.length ? feat : all.slice(0, 4);
 }

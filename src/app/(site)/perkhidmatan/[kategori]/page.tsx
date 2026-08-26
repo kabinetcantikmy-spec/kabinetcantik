@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { SERVICES } from "@/data/services";
 import { PortfolioCategory } from "@/data/portfolio";
 import { getPublishedProjects } from "@/lib/portfolioDb";
+import { currentOrg } from "@/lib/tenant";
 import ProjectCard from "@/components/ProjectCard";
 import { BLUR } from "@/lib/img";
 
@@ -21,7 +22,8 @@ export default async function ServiceCategory(props: { params: Promise<{ kategor
   const params = await props.params;
   const s = SERVICES.find((x) => x.slug === params.kategori);
   if (!s) notFound();
-  const projects = (await getPublishedProjects()).filter((p) => p.kategori === (s.slug as PortfolioCategory)).slice(0, 3);
+  const { orgId, isDefault } = await currentOrg();
+  const projects = (await getPublishedProjects(orgId, isDefault)).filter((p) => p.kategori === (s.slug as PortfolioCategory)).slice(0, 3);
 
   return (
     <article className="pb-16 pt-24">

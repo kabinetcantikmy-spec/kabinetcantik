@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getProjectBySlug } from "@/lib/portfolioDb";
+import { currentOrg } from "@/lib/tenant";
 import { CATEGORY_LABELS } from "@/data/portfolio";
 import { BLUR } from "@/lib/img";
 
@@ -10,7 +11,8 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params;
-  const p = await getProjectBySlug(params.slug);
+  const { orgId, isDefault } = await currentOrg();
+  const p = await getProjectBySlug(params.slug, orgId, isDefault);
   if (!p) return { title: "Projek tidak dijumpai | KabinetCantik" };
   return {
     title: `${p.tajuk} — ${CATEGORY_LABELS[p.kategori]} | KabinetCantik`,
@@ -21,7 +23,8 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 
 export default async function CaseStudy(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
-  const p = await getProjectBySlug(params.slug);
+  const { orgId, isDefault } = await currentOrg();
+  const p = await getProjectBySlug(params.slug, orgId, isDefault);
   if (!p) notFound();
   const gallery = p.images.length ? p.images : p.cover ? [p.cover] : [];
 

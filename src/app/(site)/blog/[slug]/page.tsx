@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { currentOrg } from "@/lib/tenant";
 import { fmtDate } from "@/lib/format";
 import JsonLd from "@/components/JsonLd";
 
@@ -17,16 +18,19 @@ interface Post {
   diterbitkan: boolean;
 }
 
-async function getPost(slug: string): Promise<Post | null> {
+async function getPost(slug: string, orgId?: string | null): Promise<Post | null> {
   if (!supabaseReady()) return null;
   const sb = createServiceClient();
-  const { data } = await sb.from("blog_posts").select("*").eq("slug", slug).eq("diterbitkan", true).single();
+  let q = sb.from("blog_posts").select("*").eq("slug", slug).eq("diterbitkan", true);
+  if (orgId) q = q.eq("org_id", orgId);
+  const { data } = await q.single();
   return (data as Post) || null;
 }
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params;
-  const post = await getPost(params.slug);
+  const { orgId } = await currentOrg();
+  const post = await getPost(params.slug, orgId);
   if (!post) return { title: "Artikel tidak dijumpai | KabinetCantik" };
   return {
     title: `${post.tajuk} | KabinetCantik`,
@@ -37,7 +41,8 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 
 export default async function BlogPost(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
-  const post = await getPost(params.slug);
+  const { orgId } = await currentOrg();
+  const post = await getPost(params.slug, orgId);
   if (!post) notFound();
 
   const base = process.env.NEXT_PUBLIC_APP_URL || "https://kabinetcantik.com";

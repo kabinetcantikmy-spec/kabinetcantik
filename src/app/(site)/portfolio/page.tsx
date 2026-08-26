@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import PortfolioGrid from "@/components/PortfolioGrid";
 import { PortfolioCategory } from "@/data/portfolio";
 import { getPublishedProjects } from "@/lib/portfolioDb";
+import { currentOrg } from "@/lib/tenant";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,8 @@ export default async function PortfolioPage(
   const initial = (k && VALID.includes(k) ? (k as PortfolioCategory) : "all") as
     | "all"
     | PortfolioCategory;
-  const projects = await getPublishedProjects();
+  const { orgId, isDefault } = await currentOrg();
+  const projects = await getPublishedProjects(orgId, isDefault);
 
   return (
     <section className="container-c pb-10 pt-28">

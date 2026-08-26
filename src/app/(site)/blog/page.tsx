@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { currentOrg } from "@/lib/tenant";
 import { fmtDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -19,10 +20,13 @@ interface Post {
 }
 
 export default async function BlogIndex() {
+  const { orgId } = await currentOrg();
   let posts: Post[] = [];
   if (supabaseReady()) {
     const sb = createServiceClient();
-    const { data } = await sb.from("blog_posts").select("slug, tajuk, ringkasan, cover_url, created_at").eq("diterbitkan", true).order("created_at", { ascending: false });
+    let q = sb.from("blog_posts").select("slug, tajuk, ringkasan, cover_url, created_at").eq("diterbitkan", true);
+    if (orgId) q = q.eq("org_id", orgId);
+    const { data } = await q.order("created_at", { ascending: false });
     posts = (data || []) as Post[];
   }
 

@@ -1,6 +1,8 @@
 "use server";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { sendEmail, emailShell } from "@/lib/email";
+import { resolveOrgId } from "@/lib/tenant";
+import { headers } from "next/headers";
 
 type Res = { ok: boolean; error?: string };
 
@@ -17,10 +19,12 @@ export async function bookSiteVisit(input: {
     return { ok: false, error: "Nama, telefon & tarikh wajib." };
   }
   const sb = createServiceClient();
+  const orgId = await resolveOrgId((await headers()).get("host"));
 
   const { data: lead } = await sb
     .from("leads")
     .insert({
+      org_id: orgId,
       nama: input.nama.trim(),
       telefon: input.telefon.trim(),
       emel: input.emel?.trim() || null,
@@ -31,6 +35,7 @@ export async function bookSiteVisit(input: {
     .single();
 
   await sb.from("appointments").insert({
+    org_id: orgId,
     lead_id: lead?.id || null,
     jenis: "site_visit",
     tarikh: input.tarikh,
