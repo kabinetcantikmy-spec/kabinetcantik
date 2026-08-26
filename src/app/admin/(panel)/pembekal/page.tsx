@@ -1,5 +1,5 @@
-import { requireRole } from "@/lib/supabaseServer";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireRole } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import SupplierAdmin, { SupplierRow, ClaimRow, VoucherRow } from "@/components/admin/SupplierAdmin";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ export default async function PembekalAdminPage() {
   let claims: ClaimRow[] = [];
   let vouchers: VoucherRow[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const [{ data: s }, { data: c }, { data: v }] = await Promise.all([
       sb.from("suppliers").select("*").order("created_at", { ascending: false }),
       sb.from("supplier_claims").select("id, no_tuntutan, butiran, jumlah, status, created_at, suppliers(nama)").order("created_at", { ascending: false }),

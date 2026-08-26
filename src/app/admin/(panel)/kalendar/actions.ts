@@ -1,6 +1,6 @@
 "use server";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { requireStaff } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
 import { waAppointment } from "@/lib/whatsapp";
 import { revalidatePath } from "next/cache";
@@ -17,7 +17,7 @@ export async function createAppointment(input: {
   const staff = await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   if (!input.tarikh) return { ok: false, error: "Tarikh wajib." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("appointments").insert({
     lead_id: input.lead_id || null,
     jenis: input.jenis,
@@ -56,7 +56,7 @@ export async function createAppointment(input: {
 export async function updateAppointmentStatus(id: string, status: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("appointments").update({ status }).eq("id", id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/kalendar");

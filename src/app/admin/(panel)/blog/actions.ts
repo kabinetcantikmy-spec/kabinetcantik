@@ -1,6 +1,6 @@
 "use server";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { requireStaff } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { revalidatePath } from "next/cache";
 
 type Res = { ok: boolean; error?: string; id?: string };
@@ -17,7 +17,7 @@ function slugify(s: string): string {
 export async function createPost(): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { count } = await sb.from("blog_posts").select("*", { count: "exact", head: true });
   const slug = `artikel-baru-${(count || 0) + 1}`;
   const { data, error } = await sb
@@ -36,7 +36,7 @@ export async function updatePost(
 ): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const p = { ...patch };
   if (p.slug) p.slug = slugify(p.slug);
   const { error } = await sb.from("blog_posts").update(p).eq("id", id);
@@ -49,7 +49,7 @@ export async function updatePost(
 export async function deletePost(id: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("blog_posts").delete().eq("id", id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/blog");

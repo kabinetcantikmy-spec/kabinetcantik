@@ -1,6 +1,6 @@
 "use server";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { requireRole } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireRole } from "@/lib/supabaseServer";
 import { sendEmail, emailShell } from "@/lib/email";
 import { rm2 } from "@/lib/format";
 import { revalidatePath } from "next/cache";
@@ -10,7 +10,7 @@ type Res = { ok: boolean; error?: string };
 export async function setSupplierStatus(supplierId: string, status: "diluluskan" | "ditolak"): Promise<Res> {
   await requireRole(["admin", "finance"]);
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: sup } = await sb.from("suppliers").select("nama, emel").eq("id", supplierId).single();
   const { error } = await sb.from("suppliers").update({ status }).eq("id", supplierId);
   if (error) return { ok: false, error: error.message };
@@ -34,7 +34,7 @@ export async function setSupplierStatus(supplierId: string, status: "diluluskan"
 export async function approveClaim(claimId: string): Promise<Res> {
   await requireRole(["admin", "finance"]);
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: claim } = await sb.from("supplier_claims").select("id, supplier_id, jumlah, status").eq("id", claimId).single();
   if (!claim) return { ok: false, error: "Tuntutan tidak dijumpai." };
   if (claim.status !== "baru") return { ok: false, error: "Tuntutan telah diproses." };
@@ -56,7 +56,7 @@ export async function approveClaim(claimId: string): Promise<Res> {
 export async function rejectClaim(claimId: string): Promise<Res> {
   await requireRole(["admin", "finance"]);
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("supplier_claims").update({ status: "ditolak" }).eq("id", claimId);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/pembekal");
@@ -66,7 +66,7 @@ export async function rejectClaim(claimId: string): Promise<Res> {
 export async function markVoucherPaid(voucherId: string): Promise<Res> {
   await requireRole(["admin", "finance"]);
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: v } = await sb.from("vouchers").select("id, claim_id, supplier_id, jumlah, no_baucer").eq("id", voucherId).single();
   if (!v) return { ok: false, error: "Baucer tidak dijumpai." };
   await sb.from("vouchers").update({ status: "dibayar", dibayar_pada: new Date().toISOString() }).eq("id", voucherId);

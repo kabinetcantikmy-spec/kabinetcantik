@@ -1,6 +1,6 @@
 "use server";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { requireStaff } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { revalidatePath } from "next/cache";
 
 type Res = { ok: boolean; error?: string };
@@ -9,7 +9,7 @@ export async function addReview(nama: string, rating: number, ulasan: string): P
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   if (!nama.trim()) return { ok: false, error: "Nama wajib." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("reviews").insert({ nama: nama.trim(), rating, ulasan: ulasan.trim() || null, diterbitkan: false });
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/ulasan");
@@ -19,7 +19,7 @@ export async function addReview(nama: string, rating: number, ulasan: string): P
 export async function togglePublishReview(id: string, diterbitkan: boolean): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("reviews").update({ diterbitkan }).eq("id", id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/ulasan");
@@ -31,7 +31,7 @@ export async function togglePublishReview(id: string, diterbitkan: boolean): Pro
 export async function deleteReview(id: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("reviews").delete().eq("id", id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/ulasan");

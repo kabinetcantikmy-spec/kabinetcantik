@@ -1,4 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import BlogEditor, { Post } from "@/components/admin/BlogEditor";
 
 export const dynamic = "force-dynamic";
@@ -6,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function BlogAdminPage() {
   let posts: Post[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data } = await sb.from("blog_posts").select("*").order("created_at", { ascending: false });
     posts = (data || []) as Post[];
   }

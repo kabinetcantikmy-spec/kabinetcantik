@@ -1,4 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import AppointmentsManager, { Appt, LeadOpt } from "@/components/admin/AppointmentsManager";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +8,7 @@ export default async function KalendarPage() {
   let appts: Appt[] = [];
   let leads: LeadOpt[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const [{ data: a }, { data: l }] = await Promise.all([
       sb.from("appointments").select("*, leads(nama)").order("tarikh", { ascending: true }),
       sb.from("leads").select("id, nama").not("stage", "eq", "Batal/Lost").order("created_at", { ascending: false }),

@@ -1,4 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import PortfolioEditor, { PortfolioRow } from "@/components/admin/PortfolioEditor";
 
 export const dynamic = "force-dynamic";
@@ -6,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function PortfolioAdminPage() {
   let items: PortfolioRow[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data } = await sb.from("portfolio").select("*, portfolio_images(id, url)").order("created_at", { ascending: false });
     items = (data || []) as PortfolioRow[];
   }

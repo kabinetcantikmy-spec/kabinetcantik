@@ -1,4 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import MaterialsEditor, { Material } from "@/components/admin/MaterialsEditor";
 
 export const dynamic = "force-dynamic";
@@ -6,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function BahanPage() {
   let materials: Material[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data } = await sb.from("materials").select("*").order("kategori").order("tier");
     materials = (data || []) as Material[];
   }

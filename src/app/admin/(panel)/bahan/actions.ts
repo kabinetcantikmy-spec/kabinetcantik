@@ -1,6 +1,6 @@
 "use server";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { requireStaff } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { PRICING } from "@/lib/pricing";
 import { revalidatePath } from "next/cache";
 
@@ -9,7 +9,7 @@ type Res = { ok: boolean; error?: string };
 export async function addMaterial(): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("materials").insert({
     kategori: "Kabinet Dapur",
     nama: "Bahan baru",
@@ -29,7 +29,7 @@ export async function updateMaterial(
 ): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("materials").update(patch).eq("id", id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/bahan");
@@ -39,7 +39,7 @@ export async function updateMaterial(
 export async function deleteMaterial(id: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { error } = await sb.from("materials").delete().eq("id", id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/bahan");
@@ -50,7 +50,7 @@ export async function deleteMaterial(id: string): Promise<Res> {
 export async function seedFromConfig(): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const rows = PRICING.categories.flatMap((c) =>
     (["economy", "standard", "premium"] as const).map((t) => ({
       kategori: c.name,

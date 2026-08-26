@@ -1,4 +1,5 @@
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabaseServer";
 import ReviewsEditor, { Review } from "@/components/admin/ReviewsEditor";
 
 export const dynamic = "force-dynamic";
@@ -6,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function UlasanAdminPage() {
   let reviews: Review[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data } = await sb.from("reviews").select("*").order("created_at", { ascending: false });
     reviews = (data || []) as Review[];
   }
