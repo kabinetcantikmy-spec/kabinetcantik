@@ -1,5 +1,5 @@
-import { requireCustomer } from "@/lib/supabaseServer";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireCustomer } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { WarrantyClaim } from "@/lib/portal";
 import { fmtDate } from "@/lib/format";
 import WarrantyForm, { ProjectOpt } from "@/components/portal/WarrantyForm";
@@ -13,7 +13,7 @@ export default async function WarrantiPage() {
   let projects: ProjectOpt[] = [];
   let claims: WarrantyClaim[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data: pr } = await sb.from("projects").select("id, tajuk").eq("customer_id", cust.customerId);
     projects = (pr || []) as ProjectOpt[];
     const ids = projects.map((p) => p.id);

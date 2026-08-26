@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { requireCustomer } from "@/lib/supabaseServer";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireCustomer } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { PROJECT_STAGES, Project } from "@/lib/portal";
 import { rm } from "@/lib/format";
 import { fmtDate } from "@/lib/format";
@@ -11,7 +11,7 @@ export default async function PortalHome() {
   const cust = await requireCustomer();
   let projects: Project[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data } = await sb.from("projects").select("*").eq("customer_id", cust.customerId).order("created_at", { ascending: false });
     projects = (data || []) as Project[];
   }

@@ -1,5 +1,5 @@
-import { requireCustomer } from "@/lib/supabaseServer";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireCustomer } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { Design } from "@/lib/portal";
 import DesignCard from "@/components/portal/DesignCard";
 
@@ -9,7 +9,7 @@ export default async function DesignPage() {
   const cust = await requireCustomer();
   let designs: Design[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data: projects } = await sb.from("projects").select("id").eq("customer_id", cust.customerId);
     const ids = (projects || []).map((p: { id: string }) => p.id);
     if (ids.length) {

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { requireCustomer } from "@/lib/supabaseServer";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireCustomer } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { rm2 } from "@/lib/format";
 import { fmtDateTime } from "@/lib/format";
 import Logo from "@/components/Logo";
@@ -14,7 +14,7 @@ export default async function ResitPage(props: { params: Promise<{ id: string }>
   const params = await props.params;
   const cust = await requireCustomer();
   if (!supabaseReady()) return <div className="p-8 text-center text-ink/50">Supabase belum dikonfigurasi.</div>;
-  const sb = createServiceClient();
+  const sb = createSupabaseServer();
   const { data: pay } = await sb
     .from("payments")
     .select("*, projects(tajuk, customer_id, customers(nama, emel))")

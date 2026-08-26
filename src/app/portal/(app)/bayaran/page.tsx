@@ -1,5 +1,5 @@
-import { requireCustomer } from "@/lib/supabaseServer";
-import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import { createSupabaseServer, requireCustomer } from "@/lib/supabaseServer";
+import { supabaseReady } from "@/lib/supabase";
 import { Payment } from "@/lib/portal";
 import { rm2 } from "@/lib/format";
 import { fmtDate } from "@/lib/format";
@@ -14,7 +14,7 @@ export default async function BayaranPage(props: { searchParams: Promise<{ statu
   const cust = await requireCustomer();
   let payments: (Payment & { projects?: { tajuk: string } | null })[] = [];
   if (supabaseReady()) {
-    const sb = createServiceClient();
+    const sb = createSupabaseServer();
     const { data: projects } = await sb.from("projects").select("id").eq("customer_id", cust.customerId);
     const ids = (projects || []).map((p: { id: string }) => p.id);
     if (ids.length) {
