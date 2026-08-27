@@ -6,9 +6,8 @@ export default function BayaranBalik() {
       <h1 className="font-display text-3xl font-semibold text-ink">Dasar Bayaran Balik & Pembatalan</h1>
       <p className="mt-1 text-sm text-ink/50">Berkuat kuasa: 27 Ogos 2026 · Kemas kini terakhir: 27 Ogos 2026</p>
 
-      <Sec n="1" t="Percubaan Percuma 14 Hari">
-        Kami menawarkan percubaan percuma selama <b>14 hari</b> supaya anda boleh menilai Perkhidmatan sebelum membayar.
-        Tiada caj dikenakan semasa percubaan. Kami menggalakkan anda menggunakan tempoh ini sepenuhnya.
+      <Sec n="1" t="Akses Percuma">
+        Pada peringkat pelancaran, akses ke Perkhidmatan disediakan secara percuma. Tiada caj dikenakan semasa tempoh percuma ini. Sebarang yuran langganan akan dimaklumkan kepada anda terlebih dahulu sebelum ia berkuat kuasa.
       </Sec>
 
       <Sec n="2" t="Langganan Bulanan — Tiada Bayaran Balik">
@@ -29,7 +28,7 @@ export default function BayaranBalik() {
       </Sec>
 
       <Sec n="5" t="Penurunan Pakej (Downgrade)">
-        Anda boleh menurunkan pakej (cth Pro ke Hero, atau ke Freemium). Perubahan berkuat kuasa pada kitaran bil
+        Anda boleh menurunkan pakej langganan anda. Perubahan berkuat kuasa pada kitaran bil
         berikutnya; tiada bayaran balik prorata untuk baki kitaran semasa.
       </Sec>
 

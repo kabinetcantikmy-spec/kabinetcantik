@@ -28,16 +28,11 @@ export default function TermaPerkhidmatan() {
       </Sec>
 
       <Sec n="4" t="Langganan, Pakej & Pembayaran">
-        Perkhidmatan ditawarkan dalam beberapa pakej: <b>Freemium</b> (RM0/bulan), <b>Hero</b> (RM249/bulan) dan
-        <b> Pro</b> (RM499/bulan). Yuran langganan dikira setiap bulan dan dibayar terlebih dahulu melalui gerbang
-        pembayaran pihak ketiga (CHIP). Harga tidak termasuk cukai yang berkenaan (cth SST) melainkan dinyatakan.
-        Langganan diperbaharui secara automatik setiap kitaran sehingga dibatalkan. Kami boleh mengubah harga dengan
-        notis 30 hari.
+        Perkhidmatan ditawarkan dalam beberapa pakej langganan. Pada peringkat pelancaran semasa, akses disediakan secara percuma; sebarang yuran langganan dan butiran harga akan dimaklumkan kepada anda terlebih dahulu sebelum ia dikenakan. Apabila berbayar, yuran dibayar melalui gerbang pembayaran pihak ketiga (CHIP), tidak termasuk cukai berkenaan (cth SST) melainkan dinyatakan, dan langganan diperbaharui setiap kitaran sehingga dibatalkan. Kami akan memberi notis sekurang-kurangnya 30 hari untuk sebarang perubahan harga.
       </Sec>
 
-      <Sec n="5" t="Percubaan Percuma (Trial)">
-        Kami mungkin menawarkan tempoh percubaan percuma selama <b>14 hari</b>. Selepas tempoh tamat, akaun akan beralih
-        ke pakej yang dipilih (atau pakej Freemium) melainkan dibatalkan. Tiada pembayaran dikenakan semasa percubaan.
+      <Sec n="5" t="Akses Percuma & Percubaan">
+        Kami mungkin menyediakan akses percuma atau tempoh percubaan dari semasa ke semasa. Tiada pembayaran dikenakan semasa tempoh percuma. Sebarang peralihan kepada pakej berbayar akan dimaklumkan kepada anda terlebih dahulu.
       </Sec>
 
       <Sec n="6" t="Penggunaan Boleh Terima">

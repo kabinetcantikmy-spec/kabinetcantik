@@ -77,11 +77,11 @@ export default function Footer({
             <div>© {year} {brand?.nama || "KabinetCantik"}. Hak cipta terpelihara.</div>
             {operator && <div className="text-white/40">Dikendalikan oleh {operator.nama} · No. Pendaftaran {operator.ssm}</div>}
           </div>
-          <span className="flex flex-wrap gap-x-4 gap-y-1">
-            <Link href="/legal/terma-perkhidmatan" className="hover:text-brass">Terma</Link>
-            <Link href="/legal/privasi" className="hover:text-brass">Privasi</Link>
-            <Link href="/legal/bayaran-balik" className="hover:text-brass">Bayaran Balik</Link>
-            <Link href="/legal/penghantaran" className="hover:text-brass">Penghantaran</Link>
+          <span className="flex flex-wrap gap-2">
+            <Link href="/legal/terma-perkhidmatan" className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 transition hover:border-brass hover:text-brass">Terma</Link>
+            <Link href="/legal/privasi" className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 transition hover:border-brass hover:text-brass">Privasi</Link>
+            <Link href="/legal/bayaran-balik" className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 transition hover:border-brass hover:text-brass">Bayaran Balik</Link>
+            <Link href="/legal/penghantaran" className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 transition hover:border-brass hover:text-brass">Penghantaran</Link>
           </span>
         </div>
       </div>
