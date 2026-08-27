@@ -2,13 +2,14 @@ import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseS
 import { supabaseReady } from "@/lib/supabase";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import { loadHomepageConfig } from "@/lib/homepageServer";
-import { loadServices, loadMaterials } from "@/lib/siteContentServer";
+import { loadServices, loadMaterials, loadPortfolioPage } from "@/lib/siteContentServer";
 import { tenantBrand } from "@/lib/branding";
 import SettingsEditor, { StaffUser } from "@/components/admin/SettingsEditor";
 import HomepageEditor from "@/components/admin/HomepageEditor";
 import BrandingEditor from "@/components/admin/BrandingEditor";
 import ServicesEditor from "@/components/admin/ServicesEditor";
-import MaterialsEditor from "@/components/admin/MaterialsEditor";
+import MaterialsPageEditor from "@/components/admin/MaterialsPageEditor";
+import PortfolioPageEditor from "@/components/admin/PortfolioPageEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export default async function TetapanPage() {
   const homepage = await loadHomepageConfig(null, staff.isPlatformAdmin);
   const services = await loadServices(null);
   const materials = await loadMaterials(null);
+  const portfolioPage = await loadPortfolioPage(null);
   const brand = await tenantBrand(staff.orgId);
   let users: StaffUser[] = [];
   let waEnabled = false;
@@ -38,7 +40,8 @@ export default async function TetapanPage() {
         <BrandingEditor initial={{ nama: brand.nama, logoUrl: brand.logoUrl }} orgId={staff.orgId || ""} />
         <HomepageEditor initial={homepage} />
         <ServicesEditor initial={services} />
-        <MaterialsEditor initial={materials} />
+        <MaterialsPageEditor initial={materials} />
+        <PortfolioPageEditor initial={portfolioPage} />
         <SettingsEditor config={config} users={users} waEnabled={waEnabled} />
       </div>
     </div>

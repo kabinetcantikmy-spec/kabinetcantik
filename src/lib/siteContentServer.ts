@@ -3,6 +3,7 @@ import { createSupabaseServer } from "@/lib/supabaseServer";
 import {
   ServicesConfig, DEFAULT_SERVICES,
   MaterialsConfig, DEFAULT_MATERIALS,
+  PortfolioPageConfig, DEFAULT_PORTFOLIO_PAGE,
 } from "@/lib/siteContent";
 
 async function readSetting(key: string, orgId?: string | null): Promise<unknown> {
@@ -60,5 +61,17 @@ export async function loadMaterials(orgId?: string | null): Promise<MaterialsCon
     ctaTitle: (cfg.ctaTitle as string) || base.ctaTitle,
     ctaText: (cfg.ctaText as string) || base.ctaText,
     items: items.length ? items : base.items,
+  };
+}
+
+/** Halaman Portfolio — heading sahaja (projek datang dari DB portfolioDb). */
+export async function loadPortfolioPage(orgId?: string | null): Promise<PortfolioPageConfig> {
+  const base = DEFAULT_PORTFOLIO_PAGE;
+  const cfg = await readSetting("portfolio_page", orgId) as Partial<PortfolioPageConfig> | undefined;
+  if (!cfg) return base;
+  return {
+    eyebrow: (cfg.eyebrow as string) || base.eyebrow,
+    title: (cfg.title as string) || base.title,
+    intro: (cfg.intro as string) || base.intro,
   };
 }

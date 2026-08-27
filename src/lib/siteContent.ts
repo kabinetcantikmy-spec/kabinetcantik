@@ -55,3 +55,15 @@ export const DEFAULT_MATERIALS: MaterialsConfig = {
     { nama: "Aluminium", nota: "Tahan air, sesuai wet kitchen", img: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=600&q=80" },
   ],
 };
+
+// ---------- Halaman Portfolio (heading sahaja; projek dari DB) ----------
+export interface PortfolioPageConfig {
+  eyebrow: string;
+  title: string;
+  intro: string;
+}
+export const DEFAULT_PORTFOLIO_PAGE: PortfolioPageConfig = {
+  eyebrow: "Portfolio",
+  title: "Karya kami",
+  intro: "Setiap projek direka & difabrikasi khas. Tekan mana-mana untuk mula sebut harga dengan gaya yang sama.",
+};
