@@ -159,20 +159,28 @@ export default function PortfolioEditor({ items }: { items: PortfolioRow[] }) {
   }
 
   async function onGalleryFile(e: React.ChangeEvent<HTMLInputElement>, id: string) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    setUploading("gallery");
+    const files = Array.from(e.target.files || []);
+    e.target.value = ""; // benarkan pilih fail sama semula
+    if (!files.length) return;
     setMsg("");
-    try {
-      const url = await uploadFile(f, "portfolio-galeri");
-      const r = await addPortfolioImage(id, url);
-      if (!r.ok) throw new Error(r.error || "Gagal tambah gambar.");
-      refresh();
-    } catch (err) {
-      setMsg(err instanceof Error ? err.message : "Muat naik gagal.");
-    } finally {
-      setUploading(null);
+    let done = 0;
+    let failed = 0;
+    // Muat naik satu demi satu (elak bebankan server serentak).
+    for (const f of files) {
+      setUploading("gallery");
+      setMsg(`Memuat naik ${done + 1}/${files.length}…`);
+      try {
+        const url = await uploadFile(f, "portfolio-galeri");
+        const r = await addPortfolioImage(id, url);
+        if (!r.ok) throw new Error(r.error || "gagal");
+        done++;
+      } catch {
+        failed++;
+      }
     }
+    setUploading(null);
+    setMsg(failed ? `${done} berjaya, ${failed} gagal — cuba lagi yang gagal.` : `${done} gambar dimuat naik ✓`);
+    refresh();
   }
 
   const inp = "rounded-lg border border-ink/15 bg-paper px-3 py-2";
@@ -246,8 +254,8 @@ export default function PortfolioEditor({ items }: { items: PortfolioRow[] }) {
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <label className="cursor-pointer rounded-lg border border-ink/15 bg-white px-3 py-2 text-xs hover:bg-paper">
-                      {uploading === "gallery" ? "Memuat naik…" : "+ Upload gambar"}
-                      <input type="file" accept="image/*" className="hidden" disabled={uploading !== null} onChange={(e) => onGalleryFile(e, p.id)} />
+                      {uploading === "gallery" ? "Memuat naik…" : "+ Upload gambar (boleh banyak)"}
+                      <input type="file" accept="image/*" multiple className="hidden" disabled={uploading !== null} onChange={(e) => onGalleryFile(e, p.id)} />
                     </label>
                   </div>
                 </div>
