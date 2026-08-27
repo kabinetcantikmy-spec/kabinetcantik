@@ -1,20 +1,33 @@
-import { supabaseReady } from "@/lib/supabase";
-import { createSupabaseServer } from "@/lib/supabaseServer";
+import { supabaseReady, createServiceClient } from "@/lib/supabase";
+import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { Lead } from "@/lib/crm";
 import KanbanBoard from "@/components/admin/KanbanBoard";
 import LeadCreate from "@/components/admin/LeadCreate";
 
 export const dynamic = "force-dynamic";
 
-async function getLeads(): Promise<Lead[]> {
+type LeadRow = Lead & { org_id?: string | null };
+
+async function getLeads(): Promise<LeadRow[]> {
   if (!supabaseReady()) return [];
   const sb = createSupabaseServer();
   const { data } = await sb.from("leads").select("*").order("created_at", { ascending: false });
-  return (data || []) as Lead[];
+  return (data || []) as LeadRow[];
 }
 
 export default async function LeadsPage() {
-  const leads = await getLeads();
+  const me = await requireStaff();
+  const rows = await getLeads();
+
+  // Untuk platform admin (god-view merentas tenant), labelkan setiap lead
+  // dengan nama tenant asalnya. Tenant biasa tak perlu — semua lead org sendiri.
+  let leads: (Lead & { tenantName?: string | null })[] = rows;
+  if (me.isPlatformAdmin && rows.length && supabaseReady()) {
+    const svc = createServiceClient();
+    const { data: tenants } = await svc.from("tenants").select("id, nama");
+    const nameByOrg = new Map<string, string>((tenants || []).map((t) => [t.id as string, (t.nama as string) || ""]));
+    leads = rows.map((l) => ({ ...l, tenantName: l.org_id ? nameByOrg.get(l.org_id) || null : null }));
+  }
   return (
     <div>
       <div className="flex items-center justify-between">

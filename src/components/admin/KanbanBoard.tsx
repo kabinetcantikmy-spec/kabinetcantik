@@ -8,9 +8,11 @@ import { updateStage } from "@/app/admin/(panel)/leads/actions";
 
 const COLUMNS = [...STAGES, LOST];
 
-export default function KanbanBoard({ leads }: { leads: Lead[] }) {
+type LeadCard = Lead & { tenantName?: string | null };
+
+export default function KanbanBoard({ leads }: { leads: LeadCard[] }) {
   const router = useRouter();
-  const [items, setItems] = useState<Lead[]>(leads);
+  const [items, setItems] = useState<LeadCard[]>(leads);
   const [dragId, setDragId] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -81,6 +83,11 @@ export default function KanbanBoard({ leads }: { leads: Lead[] }) {
                   className="cursor-grab rounded-lg border border-ink/10 bg-white p-3 shadow-sm active:cursor-grabbing"
                 >
                   <Link href={`/admin/leads/${l.id}`} className="block">
+                    {l.tenantName && (
+                      <div className="mb-1 inline-block rounded bg-ink/[0.06] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink/50">
+                        🏢 {l.tenantName}
+                      </div>
+                    )}
                     <div className="text-sm font-semibold text-ink">{l.nama}</div>
                     <div className="text-xs text-ink/50">{l.telefon}</div>
                     <div className="mt-1 flex flex-wrap gap-1">

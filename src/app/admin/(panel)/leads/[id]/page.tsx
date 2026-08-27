@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabaseReady } from "@/lib/supabase";
-import { createSupabaseServer } from "@/lib/supabaseServer";
+import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { Lead, LeadActivity } from "@/lib/crm";
 import { rm } from "@/lib/format";
 import { fmtDateTime, fmtDate } from "@/lib/format";
@@ -17,9 +17,11 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
   if (!supabaseReady()) {
     return <div className="rounded-xl border border-dashed border-ink/20 bg-white p-8 text-center text-ink/50">Supabase belum dikonfigurasi.</div>;
   }
+  const me = await requireStaff();
   const sb = createSupabaseServer();
   const { data: lead } = await sb.from("leads").select("*").eq("id", params.id).single();
-  const brand = await tenantBrand((lead as { org_id?: string } | null)?.org_id);
+  const leadOrgId = (lead as { org_id?: string | null } | null)?.org_id ?? null;
+  const brand = await tenantBrand(leadOrgId);
   if (!lead) notFound();
   const l = lead as Lead;
 
@@ -30,10 +32,14 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
     .order("created_at", { ascending: false });
   const activities = (acts || []) as LeadActivity[];
 
-  const { data: staffRows } = await sb
+  let staffQuery = sb
     .from("profiles")
     .select("id, nama")
     .in("role", ["admin", "sales", "designer", "finance", "installer"]);
+  // Hadkan senarai "ditugaskan kepada" kepada staf org lead ini sahaja
+  // (penting untuk akaun platform admin yang boleh lihat merentas tenant).
+  if (leadOrgId) staffQuery = staffQuery.eq("org_id", leadOrgId);
+  const { data: staffRows } = await staffQuery;
   const staff = (staffRows || []) as { id: string; nama: string | null }[];
 
   const { data: fileRows } = await sb.from("lead_files").select("url").eq("lead_id", params.id);
@@ -83,6 +89,11 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
           <div className="rounded-xl border border-ink/10 bg-white p-5">
             <div className="flex items-start justify-between">
               <div>
+                {me.isPlatformAdmin && (
+                  <span className="mb-1.5 inline-flex items-center gap-1 rounded-full bg-ink/[0.06] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink/55">
+                    🏢 {brand.nama}
+                  </span>
+                )}
                 <h1 className="font-display text-2xl font-semibold text-ink">{l.nama}</h1>
                 <p className="text-sm text-ink/60">{l.telefon}{l.emel ? ` · ${l.emel}` : ""}</p>
               </div>
