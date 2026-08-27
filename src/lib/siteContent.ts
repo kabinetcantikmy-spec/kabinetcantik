@@ -101,3 +101,18 @@ export const DEFAULT_CONTACT_PAGE: ContactPageConfig = {
   showroomLabel: "Showroom",
   quoteLink: "Atau isi sebut harga pantas",
 };
+
+// ---------- Halaman Privasi ----------
+export interface PrivacyPageConfig {
+  title: string;
+  body: string; // guna {{brand}} untuk auto-isi nama syarikat; baris kosong = perenggan baru
+}
+export const DEFAULT_PRIVACY_PAGE: PrivacyPageConfig = {
+  title: "Dasar Privasi",
+  body: [
+    "{{brand}} menghormati privasi anda. Maklumat yang anda berikan (nama, nombor telefon, emel dan butiran projek) dikumpul semata-mata untuk memproses pertanyaan, sebut harga dan projek anda.",
+    "Kami tidak menjual atau menyewakan data peribadi anda kepada pihak ketiga. Data disimpan dengan selamat dan hanya diakses oleh pasukan {{brand}} yang berkaitan.",
+    "Anda boleh meminta untuk melihat, membetulkan atau memadam data peribadi anda pada bila-bila masa dengan menghubungi kami.",
+    "Dengan menggunakan laman ini, anda bersetuju dengan pengumpulan dan penggunaan maklumat seperti yang dinyatakan di atas.",
+  ].join("\n\n"),
+};

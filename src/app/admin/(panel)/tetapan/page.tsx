@@ -2,7 +2,7 @@ import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseS
 import { supabaseReady } from "@/lib/supabase";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import { loadHomepageConfig } from "@/lib/homepageServer";
-import { loadServices, loadMaterials, loadPortfolioPage, loadBlogPage, loadContactPage } from "@/lib/siteContentServer";
+import { loadServices, loadMaterials, loadPortfolioPage, loadBlogPage, loadContactPage, loadPrivacyPage } from "@/lib/siteContentServer";
 import { tenantBrand } from "@/lib/branding";
 import SettingsEditor, { StaffUser } from "@/components/admin/SettingsEditor";
 import HomepageEditor from "@/components/admin/HomepageEditor";
@@ -12,6 +12,7 @@ import MaterialsPageEditor from "@/components/admin/MaterialsPageEditor";
 import PortfolioPageEditor from "@/components/admin/PortfolioPageEditor";
 import BlogPageEditor from "@/components/admin/BlogPageEditor";
 import ContactPageEditor from "@/components/admin/ContactPageEditor";
+import PrivacyPageEditor from "@/components/admin/PrivacyPageEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export default async function TetapanPage() {
   const portfolioPage = await loadPortfolioPage(null);
   const blogPage = await loadBlogPage(null);
   const contactPage = await loadContactPage(null);
+  const privacyPage = await loadPrivacyPage(null);
   const brand = await tenantBrand(staff.orgId);
   let users: StaffUser[] = [];
   let waEnabled = false;
@@ -48,6 +50,7 @@ export default async function TetapanPage() {
         <PortfolioPageEditor initial={portfolioPage} />
         <BlogPageEditor initial={blogPage} />
         <ContactPageEditor initial={contactPage} />
+        <PrivacyPageEditor initial={privacyPage} />
         <SettingsEditor config={config} users={users} waEnabled={waEnabled} />
       </div>
     </div>

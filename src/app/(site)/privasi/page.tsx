@@ -1,15 +1,29 @@
-export const metadata = { title: "Dasar Privasi" };
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { hostBrand } from "@/lib/branding";
+import { currentOrg } from "@/lib/tenant";
+import { loadPrivacyPage } from "@/lib/siteContentServer";
 
-export default function PrivasiPage() {
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = { title: "Dasar Privasi" };
+
+export default async function PrivasiPage() {
+  const host = (await headers()).get("host");
+  const brand = await hostBrand(host);
+  const { orgId } = await currentOrg();
+  const pv = await loadPrivacyPage(orgId);
+  const body = pv.body.replaceAll("{{brand}}", brand.nama);
+  const paras = body.split(/\n{2,}/).map((x) => x.trim()).filter(Boolean);
+
   return (
     <section className="container-c max-w-3xl pb-10 pt-28">
-      <h1 className="h-display text-3xl">Dasar Privasi</h1>
-      <p className="mt-4 text-ink/70">
-        KabinetCantik menghormati privasi anda. Maklumat yang anda berikan (nama, telefon, emel, butiran projek)
-        digunakan semata-mata untuk memproses pertanyaan dan sebut harga anda. Kami tidak menjual data anda kepada
-        pihak ketiga.
-      </p>
-      <p className="mt-4 text-ink/50 text-sm">*Kandungan placeholder — ganti dengan dasar privasi rasmi sebelum go-live.</p>
+      <h1 className="h-display text-3xl">{pv.title}</h1>
+      <div className="mt-4 space-y-4 text-ink/70">
+        {paras.map((para, i) => (
+          <p key={i} className="whitespace-pre-line">{para}</p>
+        ))}
+      </div>
     </section>
   );
 }

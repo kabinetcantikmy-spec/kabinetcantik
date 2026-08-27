@@ -6,6 +6,7 @@ import {
   PortfolioPageConfig, DEFAULT_PORTFOLIO_PAGE,
   BlogPageConfig, DEFAULT_BLOG_PAGE,
   ContactPageConfig, DEFAULT_CONTACT_PAGE,
+  PrivacyPageConfig, DEFAULT_PRIVACY_PAGE,
 } from "@/lib/siteContent";
 
 async function readSetting(key: string, orgId?: string | null): Promise<unknown> {
@@ -104,5 +105,16 @@ export async function loadContactPage(orgId?: string | null): Promise<ContactPag
     areaLabel: (cfg.areaLabel as string) || base.areaLabel,
     showroomLabel: (cfg.showroomLabel as string) || base.showroomLabel,
     quoteLink: (cfg.quoteLink as string) || base.quoteLink,
+  };
+}
+
+/** Halaman Privasi — teks penuh (token {{brand}} diganti di halaman). */
+export async function loadPrivacyPage(orgId?: string | null): Promise<PrivacyPageConfig> {
+  const base = DEFAULT_PRIVACY_PAGE;
+  const cfg = await readSetting("privacy_page", orgId) as Partial<PrivacyPageConfig> | undefined;
+  if (!cfg) return base;
+  return {
+    title: (cfg.title as string) || base.title,
+    body: (cfg.body as string) || base.body,
   };
 }
