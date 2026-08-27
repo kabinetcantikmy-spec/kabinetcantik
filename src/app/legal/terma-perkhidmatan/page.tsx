@@ -4,14 +4,13 @@ export default function TermaPerkhidmatan() {
   return (
     <article className="prose-legal">
       <h1 className="font-display text-3xl font-semibold text-ink">Terma Perkhidmatan</h1>
-      <p className="mt-1 text-sm text-ink/50">Berkuat kuasa: [TARIKH] · Kemas kini terakhir: [TARIKH]</p>
+      <p className="mt-1 text-sm text-ink/50">Berkuat kuasa: 27 Ogos 2026 · Kemas kini terakhir: 27 Ogos 2026</p>
 
-      <Note />
 
       <Sec n="1" t="Pengenalan & Penerimaan">
         Terma Perkhidmatan (&ldquo;Terma&rdquo;) ini mengawal penggunaan platform perisian sebagai perkhidmatan (SaaS)
         <b> KabinetCantik OS</b> (&ldquo;Platform&rdquo;, &ldquo;Perkhidmatan&rdquo;, &ldquo;kami&rdquo;) yang dikendalikan oleh
-        <b> [Nama Entiti Sah]</b> (No. Pendaftaran: <b>[No. SSM]</b>), beralamat di <b>[Alamat Perniagaan]</b>, Malaysia.
+        <b> RENORUMAH SDN. BHD.</b> (No. Pendaftaran: <b>202301005235 (1499154-X)</b>), beralamat di <b>Suite L10-21, Level 10, Tower 1, Wangsa 118, Jalan Wangsa Delima, Wangsa Maju, 53300 Kuala Lumpur</b>, Malaysia.
         Dengan mendaftar atau menggunakan Perkhidmatan, anda bersetuju terikat dengan Terma ini. Jika anda tidak bersetuju,
         sila jangan gunakan Perkhidmatan.
       </Sec>
@@ -87,7 +86,7 @@ export default function TermaPerkhidmatan() {
       </Sec>
 
       <Sec n="14" t="Hubungi Kami">
-        Sebarang pertanyaan mengenai Terma ini: <b>lovaffmy@gmail.com</b>.
+        Sebarang pertanyaan mengenai Terma ini: <b>admin@renorumah.com</b>.
       </Sec>
     </article>
   );
@@ -102,11 +101,3 @@ function Sec({ n, t, children }: { n: string; t: string; children: React.ReactNo
   );
 }
 
-function Note() {
-  return (
-    <div className="mt-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-      <b>Nota untuk pemilik:</b> Ganti semua medan <code>[ ]</code> dengan butiran syarikat sebenar sebelum guna.
-      Dokumen ini templat asas — sila semak dengan penasihat undang-undang untuk pematuhan penuh.
-    </div>
-  );
-}

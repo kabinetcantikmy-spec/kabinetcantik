@@ -5,6 +5,7 @@ export default function LegalIndex() {
     { href: "/legal/terma-perkhidmatan", label: "Terma Perkhidmatan", desc: "Syarat penggunaan platform & langganan." },
     { href: "/legal/privasi", label: "Dasar Privasi", desc: "Cara kami kumpul, guna & lindungi data (PDPA 2010)." },
     { href: "/legal/bayaran-balik", label: "Dasar Bayaran Balik & Pembatalan", desc: "Terma langganan, pembatalan & bayaran balik." },
+    { href: "/legal/penghantaran", label: "Dasar Penghantaran & Penyampaian", desc: "Penyampaian perkhidmatan digital (SaaS)." },
   ];
   return (
     <div>

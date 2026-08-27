@@ -4,8 +4,7 @@ export default function BayaranBalik() {
   return (
     <article>
       <h1 className="font-display text-3xl font-semibold text-ink">Dasar Bayaran Balik & Pembatalan</h1>
-      <p className="mt-1 text-sm text-ink/50">Berkuat kuasa: [TARIKH] · Kemas kini terakhir: [TARIKH]</p>
-      <Note />
+      <p className="mt-1 text-sm text-ink/50">Berkuat kuasa: 27 Ogos 2026 · Kemas kini terakhir: 27 Ogos 2026</p>
 
       <Sec n="1" t="Percubaan Percuma 14 Hari">
         Kami menawarkan percubaan percuma selama <b>14 hari</b> supaya anda boleh menilai Perkhidmatan sebelum membayar.
@@ -25,7 +24,7 @@ export default function BayaranBalik() {
       </Sec>
 
       <Sec n="4" t="Cara Membatalkan">
-        Batalkan melalui tetapan akaun anda dalam Platform, atau hubungi kami di <b>lovaffmy@gmail.com</b>. Kami akan
+        Batalkan melalui tetapan akaun anda dalam Platform, atau hubungi kami di <b>admin@renorumah.com</b>. Kami akan
         mengesahkan pembatalan melalui emel.
       </Sec>
 
@@ -45,7 +44,7 @@ export default function BayaranBalik() {
       </Sec>
 
       <Sec n="8" t="Hubungi">
-        Pertanyaan bil & pembatalan: <b>lovaffmy@gmail.com</b>.
+        Pertanyaan bil & pembatalan: <b>admin@renorumah.com</b>.
       </Sec>
     </article>
   );
@@ -57,12 +56,5 @@ function Sec({ n, t, children }: { n: string; t: string; children: React.ReactNo
       <h2 className="font-display text-lg font-semibold text-ink">{n}. {t}</h2>
       <p className="mt-2 text-[15px] leading-relaxed text-ink/75">{children}</p>
     </section>
-  );
-}
-function Note() {
-  return (
-    <div className="mt-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-      <b>Nota untuk pemilik:</b> Ganti medan <code>[ ]</code> dengan butiran sebenar sebelum guna.
-    </div>
   );
 }

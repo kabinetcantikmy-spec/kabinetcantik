@@ -4,11 +4,10 @@ export default function DasarPrivasi() {
   return (
     <article>
       <h1 className="font-display text-3xl font-semibold text-ink">Dasar Privasi</h1>
-      <p className="mt-1 text-sm text-ink/50">Berkuat kuasa: [TARIKH] · Kemas kini terakhir: [TARIKH]</p>
-      <Note />
+      <p className="mt-1 text-sm text-ink/50">Berkuat kuasa: 27 Ogos 2026 · Kemas kini terakhir: 27 Ogos 2026</p>
 
       <Sec n="1" t="Pengenalan">
-        Dasar ini menerangkan cara <b>[Nama Entiti Sah]</b> (&ldquo;kami&rdquo;), pengendali <b>KabinetCantik OS</b>,
+        Dasar ini menerangkan cara <b>RENORUMAH SDN. BHD.</b> (&ldquo;kami&rdquo;), pengendali <b>KabinetCantik OS</b>,
         mengumpul, menggunakan dan melindungi data peribadi selaras dengan <b>Akta Perlindungan Data Peribadi 2010 (PDPA)</b> Malaysia.
       </Sec>
 
@@ -57,7 +56,7 @@ export default function DasarPrivasi() {
       </Sec>
 
       <Sec n="10" t="Hubungi">
-        Pertanyaan privasi atau permintaan data: <b>lovaffmy@gmail.com</b>.
+        Pertanyaan privasi atau permintaan data: <b>admin@renorumah.com</b>.
       </Sec>
     </article>
   );
@@ -69,13 +68,5 @@ function Sec({ n, t, children }: { n: string; t: string; children: React.ReactNo
       <h2 className="font-display text-lg font-semibold text-ink">{n}. {t}</h2>
       <p className="mt-2 text-[15px] leading-relaxed text-ink/75">{children}</p>
     </section>
-  );
-}
-function Note() {
-  return (
-    <div className="mt-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-      <b>Nota untuk pemilik:</b> Ganti medan <code>[ ]</code> dengan butiran sebenar. Semak dengan penasihat undang-undang
-      untuk pematuhan PDPA penuh.
-    </div>
   );
 }

@@ -72,9 +72,11 @@ export default function Footer({
       <div className="border-t border-ink-line">
         <div className="container-c flex flex-col gap-2 py-5 text-xs text-white/50 sm:flex-row sm:justify-between">
           <span>© {year} {brand?.nama || "KabinetCantik"}. Hak cipta terpelihara.</span>
-          <span className="space-x-4">
-            <Link href="/privasi" className="hover:text-brass">Privasi</Link>
-            <Link href="/terma" className="hover:text-brass">Terma</Link>
+          <span className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/legal/terma-perkhidmatan" className="hover:text-brass">Terma</Link>
+            <Link href="/legal/privasi" className="hover:text-brass">Privasi</Link>
+            <Link href="/legal/bayaran-balik" className="hover:text-brass">Bayaran Balik</Link>
+            <Link href="/legal/penghantaran" className="hover:text-brass">Penghantaran</Link>
           </span>
         </div>
       </div>

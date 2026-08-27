@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/legal/terma-perkhidmatan", label: "Terma Perkhidmatan" },
   { href: "/legal/privasi", label: "Dasar Privasi" },
   { href: "/legal/bayaran-balik", label: "Bayaran Balik & Pembatalan" },
+  { href: "/legal/penghantaran", label: "Dasar Penghantaran" },
 ];
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
