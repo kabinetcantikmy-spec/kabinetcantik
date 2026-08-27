@@ -29,6 +29,23 @@ export default function SettingsEditor({ config, users, waEnabled = false }: { c
     setCats((prev) => prev.map((c, idx) => (idx === i ? { ...c, [tier]: val } : c)));
   }
 
+  function setCat(i: number, key: "name" | "unit", val: string) {
+    setCats((prev) => prev.map((c, idx) => (idx === i ? { ...c, [key]: val } : c)));
+  }
+  function addCat() {
+    setCats((prev) => {
+      const keys = new Set(prev.map((c) => c.key));
+      let n = prev.length + 1;
+      let key = `kategori_${n}`;
+      while (keys.has(key)) { n++; key = `kategori_${n}`; }
+      return [...prev, { key, name: "Kategori baru", unit: "kaki lari", economy: 0, standard: 0, premium: 0 }];
+    });
+  }
+  function removeCat(i: number) {
+    if (!confirm("Padam kategori ini? Ia akan hilang dari wizard sebut harga.")) return;
+    setCats((prev) => prev.filter((_, idx) => idx !== i));
+  }
+
   function save() {
     setMsg("");
     startTransition(async () => {
@@ -45,25 +62,38 @@ export default function SettingsEditor({ config, users, waEnabled = false }: { c
         <h2 className="font-display text-lg font-semibold text-ink">Kadar & Instant Estimate</h2>
         <p className="mt-1 text-sm text-ink/50">Kadar ini memandu anggaran awam di Quote Wizard.</p>
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[560px] text-sm">
+          <table className="w-full min-w-[680px] text-sm">
             <thead className="text-left text-xs uppercase tracking-wider text-ink/50">
-              <tr><th className="py-2">Kategori</th><th>Economy</th><th>Standard</th><th>Premium</th><th>Unit</th></tr>
+              <tr><th className="py-2">Kategori</th><th>Economy</th><th>Standard</th><th>Premium</th><th>Unit</th><th></th></tr>
             </thead>
             <tbody>
               {cats.map((c, i) => (
                 <tr key={c.key} className="border-t border-ink/5">
-                  <td className="py-2 pr-2 font-medium text-ink">{c.name}</td>
+                  <td className="py-2 pr-2">
+                    <input value={c.name} onChange={(e) => setCat(i, "name", e.target.value)} placeholder="Nama kategori" className="w-40 rounded border border-ink/15 bg-paper px-2 py-1" />
+                  </td>
                   {TIERS.map((t) => (
                     <td key={t} className="py-2 pr-2">
                       <input type="number" value={c[t]} onChange={(e) => setRate(i, t, Number(e.target.value))} className="w-24 rounded border border-ink/15 bg-paper px-2 py-1 text-right" />
                     </td>
                   ))}
-                  <td className="py-2 text-xs text-ink/40">{c.unit}</td>
+                  <td className="py-2 pr-2">
+                    <select value={c.unit} onChange={(e) => setCat(i, "unit", e.target.value)} className="rounded border border-ink/15 bg-paper px-2 py-1 text-xs">
+                      <option value="kaki lari">kaki lari</option>
+                      <option value="kaki persegi">kaki persegi</option>
+                      <option value="unit">unit</option>
+                      <option value="set">set</option>
+                    </select>
+                  </td>
+                  <td className="py-2">
+                    <button type="button" onClick={() => removeCat(i)} className="text-red-400 hover:text-red-600" title="Padam kategori">✕</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <button type="button" onClick={addCat} className="mt-3 rounded-lg border border-ink/15 px-4 py-2 text-sm hover:bg-paper">+ Tambah kategori</button>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <label className="text-sm">Lebar julat awam (%)

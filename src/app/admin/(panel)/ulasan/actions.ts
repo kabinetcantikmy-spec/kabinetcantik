@@ -5,12 +5,19 @@ import { revalidatePath } from "next/cache";
 
 type Res = { ok: boolean; error?: string };
 
-export async function addReview(nama: string, rating: number, ulasan: string): Promise<Res> {
+export async function addReview(nama: string, rating: number, ulasan: string, avatarUrl?: string, projekUrl?: string): Promise<Res> {
   await requireStaff();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   if (!nama.trim()) return { ok: false, error: "Nama wajib." };
   const sb = createSupabaseServer();
-  const { error } = await sb.from("reviews").insert({ nama: nama.trim(), rating, ulasan: ulasan.trim() || null, diterbitkan: false });
+  const { error } = await sb.from("reviews").insert({
+    nama: nama.trim(),
+    rating,
+    ulasan: ulasan.trim() || null,
+    avatar_url: (avatarUrl || "").trim() || null,
+    projek_url: (projekUrl || "").trim() || null,
+    diterbitkan: false,
+  });
   if (error) return { ok: false, error: error.message };
   revalidatePath("/admin/ulasan");
   return { ok: true };

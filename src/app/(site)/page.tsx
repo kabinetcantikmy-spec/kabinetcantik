@@ -16,14 +16,14 @@ const TESTIMONIALS = [
   { name: "Puan Mei", area: "Mont Kiara", text: "Team responsive di WhatsApp, quotation pun jelas. Recommended!" },
 ];
 
-interface HomeReview { nama: string; rating: number; ulasan: string | null }
+interface HomeReview { nama: string; rating: number; ulasan: string | null; avatar_url: string | null; projek_url: string | null }
 
 export default async function HomePage() {
   const { orgId, isDefault } = await currentOrg();
   const hp = await loadHomepageConfig(orgId, isDefault);
   const featured = (await getFeaturedProjects(orgId, isDefault)).slice(0, 6);
 
-  let testimonials: { name: string; text: string; rating: number; area?: string }[] = (isDefault ? TESTIMONIALS : []).map((t) => ({
+  let testimonials: { name: string; text: string; rating: number; area?: string; avatar?: string; projek?: string }[] = (isDefault ? TESTIMONIALS : []).map((t) => ({
     name: t.name,
     text: t.text,
     rating: 5,
@@ -31,12 +31,12 @@ export default async function HomePage() {
   }));
   if (supabaseReady()) {
     const sb = createServiceClient();
-    let rq = sb.from("reviews").select("nama, rating, ulasan").eq("diterbitkan", true);
+    let rq = sb.from("reviews").select("nama, rating, ulasan, avatar_url, projek_url").eq("diterbitkan", true);
     if (orgId) rq = rq.eq("org_id", orgId);
     const { data } = await rq.order("created_at", { ascending: false }).limit(3);
     const rows = (data || []) as HomeReview[];
     if (rows.length) {
-      testimonials = rows.map((r) => ({ name: r.nama, text: r.ulasan || "", rating: r.rating }));
+      testimonials = rows.map((r) => ({ name: r.nama, text: r.ulasan || "", rating: r.rating, avatar: r.avatar_url || undefined, projek: r.projek_url || undefined }));
     }
   }
 
@@ -121,13 +121,25 @@ export default async function HomePage() {
           <h2 className="mt-2 h-display text-3xl">{hp.revTitle}</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {testimonials.map((t, i) => (
-              <figure key={i} className="rounded-xl border border-ink/10 bg-paper p-6">
-                <div className="text-brass">{"★".repeat(t.rating)}</div>
-                <blockquote className="mt-3 font-serif text-lg italic text-ink/85">“{t.text}”</blockquote>
-                <figcaption className="mt-4 text-sm font-semibold text-ink">
-                  {t.name}
-                  {t.area ? <span className="font-normal text-ink/50"> · {t.area}</span> : null}
-                </figcaption>
+              <figure key={i} className="overflow-hidden rounded-xl border border-ink/10 bg-paper">
+                {t.projek && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={t.projek} alt={`Projek ${t.name}`} className="aspect-[16/10] w-full object-cover" />
+                )}
+                <div className="p-6">
+                  <div className="text-brass">{"★".repeat(t.rating)}</div>
+                  <blockquote className="mt-3 font-serif text-lg italic text-ink/85">“{t.text}”</blockquote>
+                  <figcaption className="mt-4 flex items-center gap-3">
+                    {t.avatar && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={t.avatar} alt={t.name} className="h-10 w-10 rounded-full border border-ink/10 object-cover" />
+                    )}
+                    <span className="text-sm font-semibold text-ink">
+                      {t.name}
+                      {t.area ? <span className="font-normal text-ink/50"> · {t.area}</span> : null}
+                    </span>
+                  </figcaption>
+                </div>
               </figure>
             ))}
           </div>
