@@ -58,6 +58,10 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
     });
   }
 
+  function setSvcLabel(key: "dapur" | "wardrobe" | "tv" | "panel", v: string) {
+    setC((prev) => ({ ...prev, svcLabels: { ...prev.svcLabels, [key]: v } }));
+  }
+
   async function onImg(e: React.ChangeEvent<HTMLInputElement>, field: "heroImage" | "beforeImage" | "afterImage", slot: string) {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -133,6 +137,14 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
         <div className="sm:col-span-2">
           <label className={label}>Tagline</label>
           <input className={input} value={c.heroTagline} onChange={(e) => setField("heroTagline", e.target.value)} />
+        </div>
+        <div>
+          <label className={label}>Butang hero 1</label>
+          <input className={input} value={c.heroCta1} onChange={(e) => setField("heroCta1", e.target.value)} />
+        </div>
+        <div>
+          <label className={label}>Butang hero 2</label>
+          <input className={input} value={c.heroCta2} onChange={(e) => setField("heroCta2", e.target.value)} />
         </div>
       </div>
 
@@ -236,6 +248,104 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
         <div className="sm:col-span-2">
           <label className={label}>Alamat showroom (pilihan)</label>
           <input className={input} value={c.showroomAddress} onChange={(e) => setField("showroomAddress", e.target.value)} />
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-lg border border-ink/10 bg-paper/40 p-4">
+        <div className="font-display text-sm font-semibold">Tajuk & teks setiap seksyen</div>
+        <p className="mt-1 text-xs text-ink/40">Eyebrow = baris kecil atas tajuk. Semua boleh anda tukar ikut bahasa/jenama sendiri.</p>
+
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          {/* Perkhidmatan */}
+          <div>
+            <label className={label}>Perkhidmatan — eyebrow</label>
+            <input className={input} value={c.svcEyebrow} onChange={(e) => setField("svcEyebrow", e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Perkhidmatan — tajuk</label>
+            <input className={input} value={c.svcTitle} onChange={(e) => setField("svcTitle", e.target.value)} />
+          </div>
+          <div className="sm:col-span-2">
+            <div className={label}>Label 4 tile perkhidmatan</div>
+            <div className="mt-1 grid gap-2 sm:grid-cols-4">
+              <input className={input} value={c.svcLabels.dapur} onChange={(e) => setSvcLabel("dapur", e.target.value)} />
+              <input className={input} value={c.svcLabels.wardrobe} onChange={(e) => setSvcLabel("wardrobe", e.target.value)} />
+              <input className={input} value={c.svcLabels.tv} onChange={(e) => setSvcLabel("tv", e.target.value)} />
+              <input className={input} value={c.svcLabels.panel} onChange={(e) => setSvcLabel("panel", e.target.value)} />
+            </div>
+          </div>
+
+          {/* Portfolio */}
+          <div>
+            <label className={label}>Portfolio — eyebrow</label>
+            <input className={input} value={c.portEyebrow} onChange={(e) => setField("portEyebrow", e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Portfolio — tajuk</label>
+            <input className={input} value={c.portTitle} onChange={(e) => setField("portTitle", e.target.value)} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={label}>Portfolio — teks pautan &quot;lihat semua&quot;</label>
+            <input className={input} value={c.portMore} onChange={(e) => setField("portMore", e.target.value)} />
+          </div>
+
+          {/* Cara ia berfungsi */}
+          <div>
+            <label className={label}>Cara ia berfungsi — eyebrow</label>
+            <input className={input} value={c.stepsEyebrow} onChange={(e) => setField("stepsEyebrow", e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Cara ia berfungsi — tajuk</label>
+            <input className={input} value={c.stepsTitle} onChange={(e) => setField("stepsTitle", e.target.value)} />
+          </div>
+
+          {/* Bahan */}
+          <div>
+            <label className={label}>Bahan — eyebrow</label>
+            <input className={input} value={c.matEyebrow} onChange={(e) => setField("matEyebrow", e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Bahan — tajuk</label>
+            <input className={input} value={c.matTitle} onChange={(e) => setField("matTitle", e.target.value)} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={label}>Bahan — teks pautan &quot;lihat semua&quot;</label>
+            <input className={input} value={c.matMore} onChange={(e) => setField("matMore", e.target.value)} />
+          </div>
+
+          {/* Sebelum/selepas */}
+          <div>
+            <label className={label}>Sebelum/selepas — eyebrow</label>
+            <input className={input} value={c.baEyebrow} onChange={(e) => setField("baEyebrow", e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Sebelum/selepas — tajuk</label>
+            <input className={input} value={c.baTitle} onChange={(e) => setField("baTitle", e.target.value)} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={label}>Sebelum/selepas — perenggan</label>
+            <textarea className={input + " h-16"} value={c.baText} onChange={(e) => setField("baText", e.target.value)} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={label}>Sebelum/selepas — teks pautan</label>
+            <input className={input} value={c.baMore} onChange={(e) => setField("baMore", e.target.value)} />
+          </div>
+
+          {/* Ulasan */}
+          <div>
+            <label className={label}>Ulasan — eyebrow</label>
+            <input className={input} value={c.revEyebrow} onChange={(e) => setField("revEyebrow", e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Ulasan — tajuk</label>
+            <input className={input} value={c.revTitle} onChange={(e) => setField("revTitle", e.target.value)} />
+          </div>
+
+          {/* CTA button */}
+          <div className="sm:col-span-2">
+            <label className={label}>Teks butang CTA (bawah homepage)</label>
+            <input className={input} value={c.ctaButton} onChange={(e) => setField("ctaButton", e.target.value)} />
+          </div>
         </div>
       </div>
 

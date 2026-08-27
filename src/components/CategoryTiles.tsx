@@ -10,18 +10,19 @@ const DEFAULT_IMG = {
 };
 
 type TileImages = { dapur?: string; wardrobe?: string; tv?: string; panel?: string };
+type TileLabels = { dapur?: string; wardrobe?: string; tv?: string; panel?: string };
 
-export default function CategoryTiles({ images }: { images?: TileImages }) {
+export default function CategoryTiles({ images, eyebrow, title, labels }: { images?: TileImages; eyebrow?: string; title?: string; labels?: TileLabels }) {
   const TILES = [
-    { key: "dapur", label: "Kabinet Dapur", img: images?.dapur || DEFAULT_IMG.dapur },
-    { key: "wardrobe", label: "Wardrobe", img: images?.wardrobe || DEFAULT_IMG.wardrobe },
-    { key: "tv", label: "TV Cabinet", img: images?.tv || DEFAULT_IMG.tv },
-    { key: "panel", label: "Wall Panelling", img: images?.panel || DEFAULT_IMG.panel },
+    { key: "dapur", label: labels?.dapur || "Kabinet Dapur", img: images?.dapur || DEFAULT_IMG.dapur },
+    { key: "wardrobe", label: labels?.wardrobe || "Wardrobe", img: images?.wardrobe || DEFAULT_IMG.wardrobe },
+    { key: "tv", label: labels?.tv || "TV Cabinet", img: images?.tv || DEFAULT_IMG.tv },
+    { key: "panel", label: labels?.panel || "Wall Panelling", img: images?.panel || DEFAULT_IMG.panel },
   ];
   return (
     <section id="perkhidmatan" className="container-c py-20">
-      <p className="eyebrow">Perkhidmatan</p>
-      <h2 className="mt-2 h-display text-3xl">Apa yang kami reka</h2>
+      <p className="eyebrow">{eyebrow || "Perkhidmatan"}</p>
+      <h2 className="mt-2 h-display text-3xl">{title || "Apa yang kami reka"}</h2>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {TILES.map((t) => (
           <Link

@@ -20,6 +20,28 @@ export interface HomepageConfig {
   processSteps: { t: string; d: string }[]; // 4 langkah "Cara ia berfungsi"
   ctaTitle: string;
   ctaText: string;
+  // Label butang hero
+  heroCta1: string;
+  heroCta2: string;
+  // Eyebrow / tajuk / teks setiap seksyen
+  svcEyebrow: string;
+  svcTitle: string;
+  svcLabels: { dapur: string; wardrobe: string; tv: string; panel: string };
+  portEyebrow: string;
+  portTitle: string;
+  portMore: string;
+  stepsEyebrow: string;
+  stepsTitle: string;
+  matEyebrow: string;
+  matTitle: string;
+  matMore: string;
+  baEyebrow: string;
+  baTitle: string;
+  baText: string;
+  baMore: string;
+  revEyebrow: string;
+  revTitle: string;
+  ctaButton: string;
 }
 
 export const DEFAULT_HOMEPAGE: HomepageConfig = {
@@ -52,4 +74,24 @@ export const DEFAULT_HOMEPAGE: HomepageConfig = {
   ],
   ctaTitle: "Dapatkan anggaran harga dalam 2 minit",
   ctaText: "Jawab beberapa soalan ringkas, terus dapat julat harga & jadualkan ukur tapak percuma.",
+  heroCta1: "Dapatkan Sebut Harga Percuma",
+  heroCta2: "Lihat Portfolio",
+  svcEyebrow: "Perkhidmatan",
+  svcTitle: "Apa yang kami reka",
+  svcLabels: { dapur: "Kabinet Dapur", wardrobe: "Wardrobe", tv: "TV Cabinet", panel: "Wall Panelling" },
+  portEyebrow: "Portfolio",
+  portTitle: "Projek pilihan",
+  portMore: "Lihat Semua",
+  stepsEyebrow: "Prosesnya mudah",
+  stepsTitle: "Cara ia berfungsi",
+  matEyebrow: "Bahan & Kemasan",
+  matTitle: "Kualiti & pilihan tanpa kompromi",
+  matMore: "Lihat semua bahan & swatch",
+  baEyebrow: "Transformasi",
+  baTitle: "Sebelum & selepas",
+  baText: "Kami ubah ruang lama jadi dapur yang kemas & moden — tarik slider untuk lihat perbezaannya.",
+  baMore: "Lihat lebih banyak transformasi",
+  revEyebrow: "Ulasan Pelanggan",
+  revTitle: "Dipercayai keluarga & rumah anda",
+  ctaButton: "Mula Sebut Harga",
 };

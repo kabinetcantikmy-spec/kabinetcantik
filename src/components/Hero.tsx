@@ -32,8 +32,8 @@ export default function Hero({ hp = DEFAULT_HOMEPAGE }: { hp?: HomepageConfig })
             <p className="mt-5 max-w-lg font-serif text-xl italic text-tan">{hp.heroTagline}</p>
           )}
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/sebut-harga" className="btn-brass">Dapatkan Sebut Harga Percuma</Link>
-            <Link href="/portfolio" className="btn-ghost-light">Lihat Portfolio</Link>
+            <Link href="/sebut-harga" className="btn-brass">{hp.heroCta1 || DEFAULT_HOMEPAGE.heroCta1}</Link>
+            <Link href="/portfolio" className="btn-ghost-light">{hp.heroCta2 || DEFAULT_HOMEPAGE.heroCta2}</Link>
           </div>
         </div>
 
