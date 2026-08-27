@@ -22,7 +22,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <JsonLd data={localBusinessLd(brand.nama, hp.serviceArea)} />
       <Header brand={brand} />
       <main>{children}</main>
-      <Footer brand={brand} area={hp.serviceArea} address={hp.showroomAddress} tagline={hp.heroTagline} showPoweredBy={!features.removeBadge} suppliers={features.suppliers} />
+      <Footer brand={brand} area={hp.serviceArea} address={hp.showroomAddress} tagline={hp.heroTagline} showPoweredBy={!features.removeBadge} suppliers={features.suppliers} operator={isDefault ? { nama: "RENORUMAH SDN. BHD.", ssm: "202301005235 (1499154-X)" } : undefined} />
       <WhatsAppButton phone={hp.whatsapp} brandName={brand.nama} />
     </>
   );

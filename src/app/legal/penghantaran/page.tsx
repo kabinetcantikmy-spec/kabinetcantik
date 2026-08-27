@@ -25,7 +25,7 @@ export default function DasarPenghantaran() {
 
       <Sec n="4" t="Tiada Penghantaran Fizikal / Kos Pos">
         Oleh kerana Perkhidmatan bersifat digital, tiada penghantaran fizikal, kos pos, atau anggaran masa penghantaran
-        yang terpakai. Sebarang rujukan kepada "penghantaran" merujuk kepada penyampaian akses digital sahaja.
+        yang terpakai. Sebarang rujukan kepada &ldquo;penghantaran&rdquo; merujuk kepada penyampaian akses digital sahaja.
       </Sec>
 
       <Sec n="5" t="Masalah Akses Selepas Pembayaran">

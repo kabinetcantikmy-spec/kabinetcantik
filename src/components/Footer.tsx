@@ -8,6 +8,7 @@ export default function Footer({
   tagline = "Built to Fit. Styled to Last.",
   showPoweredBy = false,
   suppliers = false,
+  operator,
 }: {
   brand?: { nama: string; logoUrl: string };
   area?: string;
@@ -15,6 +16,7 @@ export default function Footer({
   tagline?: string;
   showPoweredBy?: boolean;
   suppliers?: boolean;
+  operator?: { nama: string; ssm: string };
 }) {
   const year = 2026;
   return (
@@ -71,7 +73,10 @@ export default function Footer({
       )}
       <div className="border-t border-ink-line">
         <div className="container-c flex flex-col gap-2 py-5 text-xs text-white/50 sm:flex-row sm:justify-between">
-          <span>© {year} {brand?.nama || "KabinetCantik"}. Hak cipta terpelihara.</span>
+          <div className="space-y-0.5">
+            <div>© {year} {brand?.nama || "KabinetCantik"}. Hak cipta terpelihara.</div>
+            {operator && <div className="text-white/40">Dikendalikan oleh {operator.nama} · No. Pendaftaran {operator.ssm}</div>}
+          </div>
           <span className="flex flex-wrap gap-x-4 gap-y-1">
             <Link href="/legal/terma-perkhidmatan" className="hover:text-brass">Terma</Link>
             <Link href="/legal/privasi" className="hover:text-brass">Privasi</Link>
