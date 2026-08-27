@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { marketingOff } from "@/lib/siteMode";
 import Link from "next/link";
 import Image from "next/image";
 import { BLUR } from "@/lib/img";
@@ -15,7 +17,8 @@ const STEPS = [
   { t: "Fabrikasi & Pasang", d: "Dibuat di workshop, dipasang kemas." },
 ];
 
-export default function TentangPage() {
+export default async function TentangPage() {
+  if (await marketingOff()) redirect("/sebut-harga");
   return (
     <section className="pb-16 pt-24">
       <div className="relative h-[42vh] w-full">

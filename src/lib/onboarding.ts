@@ -19,8 +19,8 @@ export interface OnboardingState {
 export const EMPTY_ONBOARDING: OnboardingState = { done: false, steps: {} };
 
 export const SETUP_STEPS = [
-  { key: "perniagaan", label: "Perniagaan Anda", desc: "Maklumat syarikat" },
   { key: "jenama", label: "Jenama", desc: "Nama brand & logo anda" },
+  { key: "perniagaan", label: "Perniagaan Anda", desc: "Maklumat syarikat" },
 ];
 
 export const ENTITI_OPTIONS = ["Sdn Bhd", "Enterprise", "Milikan Tunggal", "Perkongsian", "Lain-lain"];

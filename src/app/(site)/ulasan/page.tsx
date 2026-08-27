@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { marketingOff } from "@/lib/siteMode";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { currentOrg } from "@/lib/tenant";
 import { tenantBrand } from "@/lib/branding";
@@ -21,6 +23,7 @@ interface Review {
 }
 
 export default async function UlasanPage() {
+  if (await marketingOff()) redirect("/sebut-harga");
   const { orgId } = await currentOrg();
   const brand = await tenantBrand(orgId);
   let reviews: Review[] = [];

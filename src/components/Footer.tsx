@@ -9,6 +9,8 @@ export default function Footer({
   showPoweredBy = false,
   suppliers = false,
   operator,
+  minimal = false,
+  phone = "",
 }: {
   brand?: { nama: string; logoUrl: string };
   area?: string;
@@ -17,6 +19,8 @@ export default function Footer({
   showPoweredBy?: boolean;
   suppliers?: boolean;
   operator?: { nama: string; ssm: string };
+  minimal?: boolean;
+  phone?: string;
 }) {
   const year = 2026;
   return (
@@ -29,14 +33,17 @@ export default function Footer({
               {brand?.nama || "KabinetCantik"}
             </span>
           </div>
-          <p className="mt-4 max-w-sm font-serif text-lg italic text-brass-lite">
-            {tagline}
-          </p>
-          <p className="mt-3 max-w-sm text-sm text-white/60">
-            Reka bentuk & fabrikasi kabinet dapur, wardrobe, TV cabinet dan wall panelling kustom.
-          </p>
+          {!minimal && (
+            <>
+              <p className="mt-4 max-w-sm font-serif text-lg italic text-brass-lite">{tagline}</p>
+              <p className="mt-3 max-w-sm text-sm text-white/60">
+                Reka bentuk & fabrikasi kabinet dapur, wardrobe, TV cabinet dan wall panelling kustom.
+              </p>
+            </>
+          )}
         </div>
 
+        {!minimal && (
         <div>
           <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-tan">Laman</h4>
           <ul className="mt-4 space-y-2 text-sm text-white/70">
@@ -52,11 +59,13 @@ export default function Footer({
             {suppliers && <li><Link href="/pembekal/daftar" className="hover:text-brass">Daftar Pembekal</Link></li>}
           </ul>
         </div>
+        )}
 
         <div>
           <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-tan">Hubungi</h4>
           <ul className="mt-4 space-y-2 text-sm text-white/70">
             <li>Kawasan servis: <span className="text-white">{area}</span></li>
+            {phone && <li>WhatsApp: <span className="text-white">{phone}</span></li>}
             {address && <li>{address}</li>}
             <li><Link href="/sebut-harga" className="text-brass hover:underline">Dapatkan anggaran →</Link></li>
           </ul>
@@ -77,12 +86,14 @@ export default function Footer({
             <div>© {year} {brand?.nama || "KabinetCantik"}. Hak cipta terpelihara.</div>
             {operator && <div className="text-white/40">Dikendalikan oleh {operator.nama} · No. Pendaftaran {operator.ssm}</div>}
           </div>
+          {operator && (
           <span className="flex flex-wrap gap-2">
             <Link href="/legal/terma-perkhidmatan" className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 transition hover:border-brass hover:text-brass">Terma</Link>
             <Link href="/legal/privasi" className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 transition hover:border-brass hover:text-brass">Privasi</Link>
             <Link href="/legal/bayaran-balik" className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 transition hover:border-brass hover:text-brass">Bayaran Balik</Link>
             <Link href="/legal/penghantaran" className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 transition hover:border-brass hover:text-brass">Penghantaran</Link>
           </span>
+          )}
         </div>
       </div>
     </footer>

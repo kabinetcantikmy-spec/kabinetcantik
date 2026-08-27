@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { marketingOff } from "@/lib/siteMode";
 import Link from "next/link";
 import Image from "next/image";
 import { BLUR } from "@/lib/img";
@@ -13,6 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BahanPage() {
+  if (await marketingOff()) redirect("/sebut-harga");
   const { orgId } = await currentOrg();
   const m = await loadMaterials(orgId);
   return (

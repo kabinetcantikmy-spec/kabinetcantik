@@ -4,6 +4,44 @@ import { useRouter } from "next/navigation";
 import { rm2 } from "@/lib/format";
 import { PROJECT_STAGES, Payment, Design, WarrantyClaim } from "@/lib/portal";
 import { updateProjectStatus, addPayment, addDesign, updateWarrantyStatus, requestReview } from "@/app/admin/(panel)/projek/actions";
+import { uploadHomepageImage } from "@/app/admin/(panel)/tetapan/actions";
+
+async function downscaleImage(file: File, maxDim = 1600, quality = 0.85): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+  try {
+    const url = URL.createObjectURL(file);
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error("Gagal muat imej."));
+      i.src = url;
+    });
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+    if (scale >= 1 && file.size < 1_200_000) { URL.revokeObjectURL(url); return file; }
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { URL.revokeObjectURL(url); return file; }
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, "image/jpeg", quality));
+    return blob ? new File([blob], "gambar.jpg", { type: "image/jpeg" }) : file;
+  } catch {
+    return file;
+  }
+}
+
+async function uploadFile(file: File, slot: string): Promise<string> {
+  const blob = await downscaleImage(file);
+  const fd = new FormData();
+  fd.append("file", blob);
+  fd.append("slot", slot);
+  const res = await uploadHomepageImage(fd);
+  if (!res.ok || !res.url) throw new Error(res.error || "Muat naik gagal.");
+  return res.url;
+}
 
 export default function ProjectManage({
   projectId,
@@ -26,6 +64,26 @@ export default function ProjectManage({
   const [dTajuk, setDTajuk] = useState("");
   const [dUrl, setDUrl] = useState("");
   const [nota, setNota] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const progresFotos = designs.filter((d) => d.tajuk === "Progres kerja");
+
+  async function onProgresFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      for (const f of files) {
+        const url = await uploadFile(f, "projek-progres");
+        await addDesign(projectId, "Progres kerja", url);
+      }
+      refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Muat naik gagal.");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -46,6 +104,22 @@ export default function ProjectManage({
         >
           Jana Laporan PDF →
         </button>
+
+        <div className="mt-4">
+          <label className="text-xs font-medium text-ink/60">Gambar progres kerja</label>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {progresFotos.map((d) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={d.id} src={d.image_url} alt="Progres" className="h-16 w-16 rounded-lg border border-ink/10 object-cover" />
+            ))}
+            <label className={`flex h-16 w-16 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-brass text-brass ${uploading ? "opacity-50" : ""}`}>
+              <span className="text-lg leading-none">+</span>
+              <span className="text-[10px] font-semibold">{uploading ? "..." : "Tambah"}</span>
+              <input type="file" accept="image/*" multiple className="hidden" disabled={uploading} onChange={onProgresFiles} />
+            </label>
+          </div>
+          <p className="mt-1 text-[11px] text-ink/45">Boleh pilih banyak gambar sekali gus. Semua gambar masuk dalam PDF laporan.</p>
+        </div>
       </div>
 
       {/* Status + designs */}

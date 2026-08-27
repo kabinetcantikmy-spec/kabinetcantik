@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { marketingOff } from "@/lib/siteMode";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
@@ -41,6 +43,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 }
 
 export default async function BlogPost(props: { params: Promise<{ slug: string }> }) {
+  if (await marketingOff()) redirect("/sebut-harga");
   const params = await props.params;
   const { orgId } = await currentOrg();
   const post = await getPost(params.slug, orgId);

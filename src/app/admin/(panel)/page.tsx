@@ -80,10 +80,10 @@ export default async function Dashboard() {
       {!onboarding.done && (
         <Link href="/admin/setup" className="mb-5 flex items-center justify-between gap-4 rounded-2xl border border-brass/40 bg-brass/5 px-5 py-4 transition hover:border-brass">
           <div>
-            <div className="font-display text-lg font-semibold text-ink">🏗️ Siapkan kedai anda</div>
-            <div className="mt-0.5 text-sm text-ink/60">Lengkapkan setup — {setupDone}/{SETUP_STEPS.length} langkah selesai.</div>
+            <div className="font-display text-lg font-semibold text-ink">Kemaskini maklumat anda</div>
+            <div className="mt-0.5 text-sm text-ink/60">Lengkapkan maklumat syarikat & jenama — {setupDone}/{SETUP_STEPS.length} selesai.</div>
           </div>
-          <span className="whitespace-nowrap rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-off-white">Teruskan setup →</span>
+          <span className="whitespace-nowrap rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-off-white">Kemaskini →</span>
         </Link>
       )}
       {plan.status === "trial" && plan.trialDaysLeft !== null && plan.trialDaysLeft > 0 && (

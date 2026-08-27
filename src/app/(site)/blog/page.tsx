@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { marketingOff } from "@/lib/siteMode";
 import Link from "next/link";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { currentOrg } from "@/lib/tenant";
@@ -21,6 +23,7 @@ interface Post {
 }
 
 export default async function BlogIndex() {
+  if (await marketingOff()) redirect("/sebut-harga");
   const { orgId } = await currentOrg();
   const bp = await loadBlogPage(orgId);
   let posts: Post[] = [];

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { marketingOff } from "@/lib/siteMode";
 import Hero from "@/components/Hero";
 import CategoryTiles from "@/components/CategoryTiles";
 import ProjectCard from "@/components/ProjectCard";
@@ -19,6 +21,7 @@ const TESTIMONIALS = [
 interface HomeReview { nama: string; rating: number; ulasan: string | null; avatar_url: string | null; projek_url: string | null }
 
 export default async function HomePage() {
+  if (await marketingOff()) redirect("/sebut-harga");
   const { orgId, isDefault } = await currentOrg();
   const hp = await loadHomepageConfig(orgId, isDefault);
   const featured = (await getFeaturedProjects(orgId, isDefault)).slice(0, 6);

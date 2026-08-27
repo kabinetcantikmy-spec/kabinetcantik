@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { marketingOff } from "@/lib/siteMode";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -21,6 +23,7 @@ export async function generateMetadata(props: { params: Promise<{ kategori: stri
 }
 
 export default async function ServiceCategory(props: { params: Promise<{ kategori: string }> }) {
+  if (await marketingOff()) redirect("/sebut-harga");
   const params = await props.params;
   const { orgId, isDefault } = await currentOrg();
   const cfg = await loadServices(orgId);
