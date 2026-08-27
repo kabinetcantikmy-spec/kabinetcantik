@@ -3,6 +3,7 @@ import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { rm2 } from "@/lib/format";
 import { fmtDate } from "@/lib/format";
 import ClaimForm from "@/components/ClaimForm";
+import SupplierProfileForm, { SupplierProfile } from "@/components/SupplierProfileForm";
 
 export const dynamic = "force-dynamic";
 
@@ -16,15 +17,28 @@ const CLAIM_STATUS: Record<string, { label: string; cls: string }> = {
 interface Claim { id: string; no_tuntutan: string; butiran: string | null; jumlah: number; status: string; created_at: string }
 interface Voucher { id: string; no_baucer: string; jumlah: number; status: string; dibayar_pada: string | null }
 
+const EMPTY_PROFILE: SupplierProfile = {
+  syarikat: null, jenis_entiti: null, no_ssm: null, telefon: null, alamat: null,
+  pemilik: null, no_ic: null, bank: null, no_akaun: null, dok_ssm_url: null, dok_bank_url: null,
+};
+
 export default async function SupplierDashboard() {
   const ctx = await requireSupplier();
   let status = "pending";
+  let profilLengkap = false;
+  let profile: SupplierProfile = EMPTY_PROFILE;
   let claims: Claim[] = [];
   let vouchers: Voucher[] = [];
   if (supabaseReady()) {
     const sb = createServiceClient();
-    const { data: sup } = await sb.from("suppliers").select("status").eq("id", ctx.supplierId).single();
+    const { data: sup } = await sb
+      .from("suppliers")
+      .select("status, profil_lengkap, syarikat, jenis_entiti, no_ssm, telefon, alamat, pemilik, no_ic, bank, no_akaun, dok_ssm_url, dok_bank_url")
+      .eq("id", ctx.supplierId)
+      .single();
     status = sup?.status || "pending";
+    profilLengkap = sup?.profil_lengkap === true;
+    if (sup) profile = sup as unknown as SupplierProfile;
     const [{ data: c }, { data: v }] = await Promise.all([
       sb.from("supplier_claims").select("id, no_tuntutan, butiran, jumlah, status, created_at").eq("supplier_id", ctx.supplierId).order("created_at", { ascending: false }),
       sb.from("vouchers").select("id, no_baucer, jumlah, status, dibayar_pada").eq("supplier_id", ctx.supplierId).order("created_at", { ascending: false }),
@@ -34,20 +48,28 @@ export default async function SupplierDashboard() {
   }
 
   const approved = status === "diluluskan";
+  const canClaim = approved && profilLengkap;
+
+  const banner = status === "ditolak"
+    ? { cls: "bg-red-100 text-red-600", text: "Maaf, permohonan anda tidak diluluskan. Sila hubungi kami." }
+    : !profilLengkap
+      ? { cls: "bg-amber-100 text-amber-700", text: "Lengkapkan profil KYB anda di bawah (butiran syarikat + dokumen) untuk pengesahan sebelum boleh hantar tuntutan." }
+      : !approved
+        ? { cls: "bg-amber-100 text-amber-700", text: "Profil KYB lengkap ✓ — menunggu kelulusan admin." }
+        : { cls: "bg-green-100 text-green-700", text: "✓ Akaun anda telah diluluskan. Anda boleh hantar tuntutan." };
 
   return (
     <div>
       <h1 className="h-display text-2xl">Selamat datang, {ctx.nama.split(" ")[0]}</h1>
 
-      {/* Status banner */}
-      <div className={`mt-4 rounded-xl p-4 text-sm ${approved ? "bg-green-100 text-green-700" : status === "ditolak" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-700"}`}>
-        {approved ? "✓ Akaun anda telah diluluskan. Anda boleh hantar tuntutan." : status === "ditolak" ? "Maaf, permohonan anda tidak diluluskan. Sila hubungi kami." : "Akaun anda sedang disemak. Anda boleh hantar tuntutan selepas diluluskan."}
-      </div>
+      <div className={`mt-4 rounded-xl p-4 text-sm ${banner.cls}`}>{banner.text}</div>
 
-      {approved && (
-        <div className="mt-6">
-          <ClaimForm />
-        </div>
+      {canClaim && (
+        <div className="mt-6"><ClaimForm /></div>
+      )}
+
+      {!profilLengkap && (
+        <div className="mt-6"><SupplierProfileForm initial={profile} /></div>
       )}
 
       {/* Claims */}
@@ -94,6 +116,14 @@ export default async function SupplierDashboard() {
             ))}
           </div>
         </>
+      )}
+
+      {/* Kemaskini profil (bila dah lengkap) */}
+      {profilLengkap && (
+        <div className="mt-8">
+          <h2 className="mb-3 font-display text-lg font-semibold text-ink">Kemaskini profil KYB</h2>
+          <SupplierProfileForm initial={profile} />
+        </div>
       )}
     </div>
   );

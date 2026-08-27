@@ -10,12 +10,7 @@ type Res = { ok: boolean; error?: string };
 
 export async function registerSupplier(input: {
   nama: string;
-  syarikat?: string;
-  no_ssm?: string;
-  telefon?: string;
   emel: string;
-  bank?: string;
-  no_akaun?: string;
   jenis?: string;
   password: string;
 }): Promise<Res> {
@@ -31,7 +26,7 @@ export async function registerSupplier(input: {
   const { features } = await planForOrg(orgId);
   if (!features.suppliers) return { ok: false, error: "Pendaftaran pembekal tidak tersedia untuk laman ini." };
 
-  // 1) Cipta akaun auth
+  // 1) Cipta akaun auth (ringkas — profil KYB dilengkapkan selepas login)
   const { data: created, error: authErr } = await sb.auth.admin.createUser({
     email: input.emel.trim(),
     password: input.password,
@@ -41,20 +36,16 @@ export async function registerSupplier(input: {
     return { ok: false, error: authErr?.message || "Emel mungkin telah didaftarkan." };
   }
 
-  // 2) Cipta rekod supplier (pending)
+  // 2) Cipta rekod supplier (pending, profil belum lengkap)
   const { data: sup, error: supErr } = await sb
     .from("suppliers")
     .insert({
       org_id: orgId,
       nama: input.nama.trim(),
-      syarikat: input.syarikat || null,
-      no_ssm: input.no_ssm || null,
-      telefon: input.telefon || null,
       emel: input.emel.trim(),
-      bank: input.bank || null,
-      no_akaun: input.no_akaun || null,
       jenis: input.jenis === "installer" ? "installer" : "pembekal",
       status: "pending",
+      profil_lengkap: false,
     })
     .select("id")
     .single();
@@ -75,7 +66,7 @@ export async function registerSupplier(input: {
     to: input.emel.trim(),
     fromName: brand.nama,
     subject: `Pendaftaran pembekal diterima — ${brand.nama}`,
-    html: emailShell("Terima kasih mendaftar", `Permohonan anda sedang disemak. Kami akan maklumkan sebaik sahaja akaun anda diluluskan. Anda boleh log masuk di <b>/pembekal/login</b>.`, brand.nama),
+    html: emailShell("Terima kasih mendaftar", `Akaun anda dah dicipta. Langkah seterusnya: <b>log masuk & lengkapkan profil KYB</b> (butiran syarikat + dokumen) supaya kami boleh sahkan & luluskan akaun anda. Log masuk di <b>/pembekal/login</b>.`, brand.nama),
   });
 
   return { ok: true };
