@@ -4,6 +4,8 @@ import {
   ServicesConfig, DEFAULT_SERVICES,
   MaterialsConfig, DEFAULT_MATERIALS,
   PortfolioPageConfig, DEFAULT_PORTFOLIO_PAGE,
+  BlogPageConfig, DEFAULT_BLOG_PAGE,
+  ContactPageConfig, DEFAULT_CONTACT_PAGE,
 } from "@/lib/siteContent";
 
 async function readSetting(key: string, orgId?: string | null): Promise<unknown> {
@@ -73,5 +75,34 @@ export async function loadPortfolioPage(orgId?: string | null): Promise<Portfoli
     eyebrow: (cfg.eyebrow as string) || base.eyebrow,
     title: (cfg.title as string) || base.title,
     intro: (cfg.intro as string) || base.intro,
+  };
+}
+
+/** Halaman Blog — heading sahaja (artikel dari blog_posts). */
+export async function loadBlogPage(orgId?: string | null): Promise<BlogPageConfig> {
+  const base = DEFAULT_BLOG_PAGE;
+  const cfg = await readSetting("blog_page", orgId) as Partial<BlogPageConfig> | undefined;
+  if (!cfg) return base;
+  return {
+    eyebrow: (cfg.eyebrow as string) || base.eyebrow,
+    title: (cfg.title as string) || base.title,
+    intro: (cfg.intro as string) || base.intro,
+    emptyText: (cfg.emptyText as string) || base.emptyText,
+  };
+}
+
+/** Halaman Hubungi — teks tetap (data WA/kawasan/showroom dari homepage config). */
+export async function loadContactPage(orgId?: string | null): Promise<ContactPageConfig> {
+  const base = DEFAULT_CONTACT_PAGE;
+  const cfg = await readSetting("contact_page", orgId) as Partial<ContactPageConfig> | undefined;
+  if (!cfg) return base;
+  return {
+    eyebrow: (cfg.eyebrow as string) || base.eyebrow,
+    title: (cfg.title as string) || base.title,
+    intro: (cfg.intro as string) || base.intro,
+    waButton: (cfg.waButton as string) || base.waButton,
+    areaLabel: (cfg.areaLabel as string) || base.areaLabel,
+    showroomLabel: (cfg.showroomLabel as string) || base.showroomLabel,
+    quoteLink: (cfg.quoteLink as string) || base.quoteLink,
   };
 }

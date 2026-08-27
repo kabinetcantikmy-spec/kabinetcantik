@@ -67,3 +67,37 @@ export const DEFAULT_PORTFOLIO_PAGE: PortfolioPageConfig = {
   title: "Karya kami",
   intro: "Setiap projek direka & difabrikasi khas. Tekan mana-mana untuk mula sebut harga dengan gaya yang sama.",
 };
+
+// ---------- Halaman Blog (heading sahaja; artikel dari DB) ----------
+export interface BlogPageConfig {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  emptyText: string;
+}
+export const DEFAULT_BLOG_PAGE: BlogPageConfig = {
+  eyebrow: "Blog",
+  title: "Idea & panduan",
+  intro: "Inspirasi reka bentuk & tip praktikal untuk projek kabinet anda.",
+  emptyText: "Belum ada artikel. Nantikan idea reka bentuk terbaru dari kami.",
+};
+
+// ---------- Halaman Hubungi (Contact) ----------
+export interface ContactPageConfig {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  waButton: string;
+  areaLabel: string;
+  showroomLabel: string;
+  quoteLink: string;
+}
+export const DEFAULT_CONTACT_PAGE: ContactPageConfig = {
+  eyebrow: "Hubungi",
+  title: "Mari berbual",
+  intro: "Ada soalan atau nak mula projek? Hubungi kami — biasanya kami balas dalam masa sejam pada waktu bekerja.",
+  waButton: "WhatsApp Kami",
+  areaLabel: "Kawasan servis",
+  showroomLabel: "Showroom",
+  quoteLink: "Atau isi sebut harga pantas",
+};

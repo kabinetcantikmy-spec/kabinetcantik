@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { currentOrg } from "@/lib/tenant";
 import { fmtDate } from "@/lib/format";
+import { loadBlogPage } from "@/lib/siteContentServer";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ interface Post {
 
 export default async function BlogIndex() {
   const { orgId } = await currentOrg();
+  const bp = await loadBlogPage(orgId);
   let posts: Post[] = [];
   if (supabaseReady()) {
     const sb = createServiceClient();
@@ -32,13 +34,13 @@ export default async function BlogIndex() {
 
   return (
     <section className="container-c pb-10 pt-28">
-      <p className="eyebrow">Blog</p>
-      <h1 className="mt-2 h-display text-4xl">Idea & panduan</h1>
-      <p className="mt-3 max-w-xl text-ink/60">Inspirasi reka bentuk & tip praktikal untuk projek kabinet anda.</p>
+      <p className="eyebrow">{bp.eyebrow}</p>
+      <h1 className="mt-2 h-display text-4xl">{bp.title}</h1>
+      <p className="mt-3 max-w-xl text-ink/60">{bp.intro}</p>
 
       {posts.length === 0 ? (
         <div className="mt-10 rounded-xl border border-dashed border-ink/20 bg-white p-8 text-center text-ink/50">
-          Belum ada artikel. Nantikan idea reka bentuk terbaru dari kami.
+          {bp.emptyText}
         </div>
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
