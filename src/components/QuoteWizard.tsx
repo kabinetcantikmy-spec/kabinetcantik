@@ -11,12 +11,10 @@ const TIERS: { key: Tier; label: string; note: string }[] = [
 
 const TIMELINES = ["Secepat mungkin", "1–3 bulan", "3–6 bulan", "Sekadar tinjau"];
 
-// Papar unit tanpa jargon "lari" — "kaki lari" jadi "kaki". "kaki persegi" kekal.
 function displayUnit(u: string): string {
   return u.replace(/kaki lari/gi, "kaki");
 }
 
-// Pilihan wizard: satu kad = satu kategori, KECUALI dapur (gabung atas + bawah).
 type WizOption = { key: string; name: string; parts: CategoryRate[] };
 
 function buildOptions(cfg: PricingConfig): WizOption[] {
@@ -45,7 +43,6 @@ function defaultQty(key: string): number {
   return 10;
 }
 
-// Label mesra untuk setiap bahagian (bila dapur ada 2 bahagian).
 function partLabel(key: string, name: string): string {
   if (key === "dapur_bawah") return "Kabinet bawah";
   if (key === "dapur_atas") return "Kabinet atas";
@@ -66,7 +63,7 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
   }
 
   const [step, setStep] = useState(0);
-  const [selKey, setSelKey] = useState<string>(initialOptionKey());
+  const [selKeys, setSelKeys] = useState<string[]>(() => [initialOptionKey()]);
   const [tier, setTier] = useState<Tier>("standard");
   const [qtys, setQtys] = useState<Record<string, number>>(() => {
     const o: Record<string, number> = {};
@@ -89,7 +86,9 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
       const raw = localStorage.getItem("kc_wizard");
       if (raw) {
         const s = JSON.parse(raw);
-        if (s.selKey && options.some((o) => o.key === s.selKey)) setSelKey(s.selKey);
+        const restored: string[] = Array.isArray(s.selKeys) ? s.selKeys : s.selKey ? [s.selKey] : [];
+        const valid = restored.filter((k) => options.some((o) => o.key === k));
+        if (valid.length) setSelKeys(valid);
         if (s.tier) setTier(s.tier);
         if (s.qtys && typeof s.qtys === "object") setQtys((q) => ({ ...q, ...s.qtys }));
         if (s.budget) setBudget(s.budget);
@@ -104,27 +103,32 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
 
   useEffect(() => {
     try {
-      localStorage.setItem("kc_wizard", JSON.stringify({ selKey, tier, qtys, budget, timeline, step }));
+      localStorage.setItem("kc_wizard", JSON.stringify({ selKeys, tier, qtys, budget, timeline, step }));
     } catch {
       /* noop */
     }
-  }, [selKey, tier, qtys, budget, timeline, step]);
+  }, [selKeys, tier, qtys, budget, timeline, step]);
 
-  const sel = options.find((o) => o.key === selKey) || options[0];
+  const selected = options.filter((o) => selKeys.includes(o.key));
+  const allParts = selected.flatMap((o) => o.parts);
+
+  function toggleOption(key: string) {
+    setSelKeys((cur) => (cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key]));
+  }
 
   const est = useMemo(() => {
-    let base = sel.parts.reduce((sum, p) => sum + p[tier] * (qtys[p.key] || 0), 0);
+    let base = allParts.reduce((sum, p) => sum + p[tier] * (qtys[p.key] || 0), 0);
     if (base <= 0) return null;
     if (cfg.sstEnabled) base = base * (1 + cfg.sstRate / 100);
     const rp = cfg.publicRangePct / 100;
     return { low: base * (1 - rp), high: base * (1 + rp) };
-  }, [sel, tier, qtys, cfg]);
+  }, [allParts, tier, qtys, cfg]);
 
-  const totalQty = sel.parts.reduce((s, p) => s + (qtys[p.key] || 0), 0);
+  const totalQty = allParts.reduce((s, p) => s + (qtys[p.key] || 0), 0);
 
   const steps = ["Kategori", "Saiz & Bahan", "Bajet & Masa", "Maklumat Anda"];
   const canNext =
-    (step === 0 && !!selKey) ||
+    (step === 0 && selKeys.length > 0) ||
     (step === 1 && totalQty > 0) ||
     (step === 2 && !!timeline) ||
     step === 3;
@@ -159,7 +163,7 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
       }
 
       const partQtys: Record<string, number> = {};
-      sel.parts.forEach((p) => (partQtys[p.key] = qtys[p.key] || 0));
+      allParts.forEach((p) => (partQtys[p.key] = qtys[p.key] || 0));
 
       const res = await fetch("/api/lead", {
         method: "POST",
@@ -168,8 +172,8 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
           nama,
           telefon,
           emel,
-          kategori: sel.parts.map((p) => p.key),
-          jawapan_wizard: { option: sel.key, tier, qtys: partQtys, budget, timeline },
+          kategori: allParts.map((p) => p.key),
+          jawapan_wizard: { options: selKeys, tier, qtys: partQtys, budget, timeline },
           estimate: est ? { low: Math.round(est.low), high: Math.round(est.high) } : null,
           photos,
         }),
@@ -203,7 +207,7 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
             <div className="mt-1 font-serif text-3xl text-tan">
               {formatRM(est.low)} – {formatRM(est.high)}
             </div>
-            <p className="mt-2 text-xs text-white/50">Julat indikatif. Harga tepat selepas ukur tapak.</p>
+            <p className="mt-2 text-xs text-white/50">Julat indikatif untuk semua yang dipilih. Harga tepat selepas ukur tapak.</p>
           </div>
         )}
         {done.waLink && (
@@ -217,7 +221,6 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* Wizard */}
       <div className="rounded-2xl border border-ink/10 bg-white p-6 sm:p-8">
         {/* progress */}
         <div className="mb-6 flex gap-2">
@@ -232,22 +235,30 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
         {step === 0 && (
           <div>
             <h2 className="font-display text-xl font-semibold text-ink">Apa yang anda nak reka?</h2>
+            <p className="mt-1 text-sm text-ink/50">Boleh pilih lebih dari satu — cth dapur + TV cabinet + wardrobe.</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {options.map((o) => (
-                <button
-                  key={o.key}
-                  onClick={() => setSelKey(o.key)}
-                  className={`rounded-xl border p-4 text-left transition ${
-                    selKey === o.key ? "border-brass bg-brass/5" : "border-ink/15 hover:border-brass/50"
-                  }`}
-                >
-                  <div className="font-semibold text-ink">{o.name}</div>
-                  <div className="text-xs text-ink/50">
-                    {o.key === "dapur" ? "atas + bawah" : `per ${displayUnit(o.parts[0].unit)}`}
-                  </div>
-                </button>
-              ))}
+              {options.map((o) => {
+                const on = selKeys.includes(o.key);
+                return (
+                  <button
+                    key={o.key}
+                    onClick={() => toggleOption(o.key)}
+                    className={`relative rounded-xl border p-4 text-left transition ${
+                      on ? "border-brass bg-brass/5" : "border-ink/15 hover:border-brass/50"
+                    }`}
+                  >
+                    <div className={`absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-md border text-[11px] ${on ? "border-brass bg-brass text-white" : "border-ink/25 text-transparent"}`}>✓</div>
+                    <div className="font-semibold text-ink">{o.name}</div>
+                    <div className="text-xs text-ink/50">
+                      {o.key === "dapur" ? "atas + bawah" : `per ${displayUnit(o.parts[0].unit)}`}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
+            {selKeys.length > 0 && (
+              <p className="mt-3 text-xs text-brass">{selKeys.length} dipilih</p>
+            )}
           </div>
         )}
 
@@ -255,41 +266,47 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
           <div>
             <h2 className="font-display text-xl font-semibold text-ink">Saiz & pilihan bahan</h2>
 
-            <div className="mt-4 space-y-4">
-              {sel.parts.map((p) => (
-                <div key={p.key}>
-                  <label className="block text-sm font-medium text-ink/80">
-                    {partLabel(p.key, p.name)} — anggaran saiz ({displayUnit(p.unit)})
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={qtys[p.key] ?? 0}
-                    onChange={(e) => setPartQty(p.key, parseFloat(e.target.value) || 0)}
-                    className="mt-2 w-full rounded-lg border border-ink/15 bg-paper px-4 py-3"
-                  />
+            <div className="mt-4 space-y-5">
+              {selected.map((o) => (
+                <div key={o.key} className="rounded-xl border border-ink/10 bg-paper/40 p-4">
+                  <div className="text-sm font-semibold text-ink">{o.name}</div>
+                  <div className="mt-3 space-y-3">
+                    {o.parts.map((p) => (
+                      <div key={p.key}>
+                        <label className="block text-sm font-medium text-ink/80">
+                          {partLabel(p.key, p.name)} — anggaran saiz ({displayUnit(p.unit)})
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={qtys[p.key] ?? 0}
+                          onChange={(e) => setPartQty(p.key, parseFloat(e.target.value) || 0)}
+                          className="mt-2 w-full rounded-lg border border-ink/15 bg-white px-4 py-3"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-xs text-ink/45">
-              {sel.key === "dapur"
-                ? "Dapur biasa: bawah 10–16 kaki, atas 8–14 kaki. Tak pasti? Anggar je — kami sahkan masa ukur tapak."
-                : "Tak pasti? Anggar je — kami sahkan masa ukur tapak."}
-            </p>
+            <p className="mt-2 text-xs text-ink/45">Tak pasti saiz? Anggar je — kami sahkan masa ukur tapak.</p>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              {TIERS.map((t) => (
-                <button
-                  key={t.key}
-                  onClick={() => setTier(t.key)}
-                  className={`rounded-xl border p-3 text-left transition ${
-                    tier === t.key ? "border-brass bg-brass/5" : "border-ink/15 hover:border-brass/50"
-                  }`}
-                >
-                  <div className="font-semibold text-ink">{t.label}</div>
-                  <div className="mt-0.5 text-[11px] text-ink/50">{t.note}</div>
-                </button>
-              ))}
+            <div className="mt-5">
+              <label className="block text-sm font-medium text-ink/80">Pilihan bahan / kemasan</label>
+              <div className="mt-2 grid gap-3 sm:grid-cols-3">
+                {TIERS.map((t) => (
+                  <button
+                    key={t.key}
+                    onClick={() => setTier(t.key)}
+                    className={`rounded-xl border p-3 text-left transition ${
+                      tier === t.key ? "border-brass bg-brass/5" : "border-ink/15 hover:border-brass/50"
+                    }`}
+                  >
+                    <div className="font-semibold text-ink">{t.label}</div>
+                    <div className="mt-0.5 text-[11px] text-ink/50">{t.note}</div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
