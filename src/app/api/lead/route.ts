@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { waSalesLink, waLink } from "@/lib/wa";
 import { waLeadWelcome } from "@/lib/whatsapp";
+import { sendEmail, emailShell, emailReady } from "@/lib/email";
 import { resolveOrgId } from "@/lib/tenant";
 import { tenantBrand } from "@/lib/branding";
 
@@ -97,25 +97,28 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Nombor WhatsApp TENANT (bukan global). Sumber: business.telefon -> homepage.whatsapp.
-  let tenantWa = "";
-  if (supabaseReady() && orgId) {
+  const brand = await tenantBrand(orgId);
+
+  // Email pengesahan ke pelanggan (lead) — janji borang: "akan dihantar ke emel ini".
+  if (emel && emailReady()) {
     try {
-      const sb = createServiceClient();
-      const { data } = await sb.from("settings").select("key, value").eq("org_id", orgId).in("key", ["business", "homepage"]);
-      const rows = (data || []) as { key: string; value: Record<string, unknown> | null }[];
-      const biz = rows.find((r) => r.key === "business")?.value as { telefon?: string } | undefined;
-      const hp = rows.find((r) => r.key === "homepage")?.value as { whatsapp?: string } | undefined;
-      tenantWa = String(biz?.telefon || hp?.whatsapp || "").trim();
-    } catch { /* ignore */ }
+      const estLine = est
+        ? `<br/><br/>Anggaran awal anda: <b>RM${est.low.toLocaleString()} – RM${est.high.toLocaleString()}</b> (indikatif — harga tepat selepas ukur tapak).`
+        : "";
+      await sendEmail({
+        to: emel,
+        fromName: brand.nama,
+        subject: `Permintaan sebut harga diterima — ${brand.nama}`,
+        html: emailShell(
+          "Terima kasih!",
+          `Hai ${nama}, kami telah menerima permintaan sebut harga anda. Team ${brand.nama} akan menghubungi anda tidak lama lagi.${estLine}`,
+          brand.nama
+        ),
+      });
+    } catch (e) {
+      console.error("Lead email failed:", e);
+    }
   }
 
-  const estText = est ? ` Anggaran awal: RM${est.low.toLocaleString()}–RM${est.high.toLocaleString()}.` : "";
-  const brand = await tenantBrand(orgId);
-  // Mesej dari sudut pelanggan (klik "Sambung di WhatsApp" pada skrin terima kasih).
-  const custMsg = `Hai ${brand.nama}, saya ${nama}. Saya baru hantar permintaan sebut harga (${(body.kategori || []).join(", ")}).${estText} Boleh bincang lanjut?`;
-  // Guna nombor tenant jika ada; jika tenant belum set, fallback ke nombor sales global.
-  const waLinkOut = tenantWa ? waLink(tenantWa, custMsg) : waSalesLink(custMsg);
-
-  return NextResponse.json({ ok: true, waLink: waLinkOut });
+  return NextResponse.json({ ok: true });
 }

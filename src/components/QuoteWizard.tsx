@@ -210,11 +210,6 @@ export default function QuoteWizard({ initialKategori, config }: { initialKatego
             <p className="mt-2 text-xs text-white/50">Julat indikatif untuk semua yang dipilih. Harga tepat selepas ukur tapak.</p>
           </div>
         )}
-        {done.waLink && (
-          <a href={done.waLink} target="_blank" rel="noopener noreferrer" className="btn-brass mt-6">
-            Sambung di WhatsApp
-          </a>
-        )}
       </div>
     );
   }
