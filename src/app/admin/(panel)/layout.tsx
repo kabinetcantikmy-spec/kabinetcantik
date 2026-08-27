@@ -2,6 +2,8 @@ import Link from "next/link";
 import { requireStaff } from "@/lib/supabaseServer";
 import { signOut } from "../auth-actions";
 import AdminNav from "@/components/admin/AdminNav";
+import { planForOrg } from "@/lib/planServer";
+import { adminNavItems } from "@/lib/adminNav";
 import Logo from "@/components/Logo";
 import { tenantBrand } from "@/lib/branding";
 
@@ -10,6 +12,8 @@ export const dynamic = "force-dynamic";
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const staff = await requireStaff();
   const brand = await tenantBrand(staff.orgId);
+  const { features } = await planForOrg(staff.orgId);
+  const navItems = adminNavItems(features);
   return (
     <div className="min-h-screen bg-paper">
       {/* Sidebar */}
@@ -18,7 +22,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <Logo src={brand.logoUrl} alt={brand.nama} className="h-9 w-9" />
           <span className="font-display text-sm font-semibold tracking-widest text-tan">{brand.nama}</span>
         </Link>
-        <AdminNav />
+        <AdminNav items={navItems} />
         {staff.isPlatformAdmin && (
           <Link href="/admin/owner" className="mt-2 rounded-lg bg-brass/20 px-3 py-2 text-sm font-semibold text-tan hover:bg-brass/30">⚙ Kawalan Platform
           </Link>
@@ -43,7 +47,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         </form>
       </header>
       <div className="sticky top-[52px] z-10 border-b border-ink/10 bg-ink px-2 py-1.5 md:hidden print:!hidden">
-        <AdminNav horizontal />
+        <AdminNav items={navItems} horizontal />
       </div>
 
       <div className="md:pl-60 print:!pl-0">

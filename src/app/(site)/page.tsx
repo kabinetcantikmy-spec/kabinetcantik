@@ -43,6 +43,17 @@ export default async function HomePage() {
   return (
     <>
       <Hero hp={hp} />
+      {isDefault && (
+        <section className="border-y border-ink/10 bg-ink text-white">
+          <div className="container-c flex flex-col items-center gap-3 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-brass-lite">Untuk pemilik rumah</p>
+              <h2 className="font-display text-xl">Nak buat kabinet? Dapatkan kontraktor dipercayai — percuma.</h2>
+            </div>
+            <Link href="/cari-kontraktor" className="btn-brass whitespace-nowrap">Cari kontraktor →</Link>
+          </div>
+        </section>
+      )}
       <CategoryTiles images={hp.serviceImages} eyebrow={hp.svcEyebrow} title={hp.svcTitle} labels={hp.svcLabels} />
 
       {/* Featured portfolio */}

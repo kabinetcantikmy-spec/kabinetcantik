@@ -64,11 +64,10 @@ export async function registerTenant(input: RegisterInput): Promise<RegisterStat
   const { data: taken } = await sb.from("tenants").select("id").eq("slug", slug).maybeSingle();
   if (taken) return { ok: false, error: `Slug "${slug}" dah diambil. Pilih lain.` };
 
-  // 2) Cipta tenant (trial 14 hari).
-  const trialEnds = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString();
+  // Cipta tenant — FASA PERCUMA: plan "launch" (aktif, tanpa trial/tamat).
   const { data: t, error: te } = await sb
     .from("tenants")
-    .insert({ nama, slug, status: "trial", plan: "trial", trial_ends_at: trialEnds })
+    .insert({ nama, slug, status: "active", plan: "launch" })
     .select("id")
     .single();
   if (te || !t) {

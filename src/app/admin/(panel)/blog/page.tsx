@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function BlogAdminPage() {
   const staff = await requireStaff();
   const { features } = await planForOrg(staff.orgId);
-  if (!features.blogReviews) return (<div><h1 className="h-display text-2xl">Blog</h1><PlanLock tier="Hero" feature="Blog & penerbitan artikel" /></div>);
+  if (!features.blog) return (<div><h1 className="h-display text-2xl">Blog</h1><PlanLock tier="Hero" feature="Blog & penerbitan artikel" /></div>);
   let posts: Post[] = [];
   if (supabaseReady()) {
     const sb = createSupabaseServer();

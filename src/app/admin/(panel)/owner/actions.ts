@@ -57,11 +57,10 @@ export async function createTenant(
 
   const sb = createServiceClient();
 
-  // 1) Cipta tenant (trial 14 hari).
-  const trialEnds = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString();
+  // Cipta tenant — FASA PERCUMA: plan "launch" (aktif, tanpa trial/tamat).
   const { data: t, error: te } = await sb
     .from("tenants")
-    .insert({ nama, slug, status: "trial", plan: "trial", trial_ends_at: trialEnds })
+    .insert({ nama, slug, status: "active", plan: "launch" })
     .select("id")
     .single();
   if (te || !t) {
@@ -124,7 +123,7 @@ export async function setTenantPlan(tenantId: string, formData: FormData): Promi
   await ensureOwner();
   if (!supabaseReady()) return;
   const plan = String(formData.get("plan") || "");
-  if (!["trial", "freemium", "hero", "pro"].includes(plan)) return;
+  if (!["trial", "freemium", "hero", "pro", "launch"].includes(plan)) return;
   const sb = createServiceClient();
   const patch: Record<string, unknown> = { plan, status: plan === "trial" ? "trial" : "active" };
   if (plan === "trial") patch.trial_ends_at = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString();
