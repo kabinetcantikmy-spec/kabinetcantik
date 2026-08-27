@@ -90,13 +90,13 @@ export default function DaftarPage() {
         <div className="flex flex-col items-center">
           <Logo className="h-14 w-14" />
           <h1 className="mt-4 font-display text-xl font-semibold tracking-wide text-ink">Daftar Syarikat</h1>
-          <p className="text-sm text-ink/50">Cuba percuma 14 hari — tiada kad kredit.</p>
+          <p className="text-sm text-ink/50">Bina laman & sistem kabinet anda — percuma. Tiada kad kredit.</p>
         </div>
 
         <div className="mt-6 space-y-3">
           <div>
             <label className="text-xs font-medium text-ink/60">Nama syarikat</label>
-            <input required value={nama} onChange={(e) => onNama(e.target.value)} placeholder="cth: Melecun Kabinet"
+            <input required value={nama} onChange={(e) => onNama(e.target.value)} placeholder="cth: Nama syarikat anda"
               className="mt-1 w-full rounded-lg border border-ink/15 bg-paper px-4 py-2.5" />
           </div>
           <div>
@@ -104,7 +104,7 @@ export default function DaftarPage() {
             <div className="mt-1 flex items-center rounded-lg border border-ink/15 bg-paper px-3">
               <input required value={slug}
                 onChange={(e) => { setSlug(slugify(e.target.value)); setSlugEdited(true); }}
-                placeholder="melecun" className="w-full bg-transparent py-2.5 font-mono text-sm outline-none" />
+                placeholder="namasyarikat" className="w-full bg-transparent py-2.5 font-mono text-sm outline-none" />
               <span className="whitespace-nowrap text-sm text-ink/40">.kabinetcantik.com</span>
             </div>
           </div>

@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/legal/privasi", label: "Dasar Privasi" },
   { href: "/legal/bayaran-balik", label: "Bayaran Balik & Pembatalan" },
   { href: "/legal/penghantaran", label: "Dasar Penghantaran" },
+  { href: "/legal/terma-marketplace", label: "Terma Marketplace" },
 ];
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {

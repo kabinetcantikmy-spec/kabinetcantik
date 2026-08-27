@@ -137,7 +137,7 @@ function BusinessForm({ initial, onSaved }: { initial: BusinessInfo; onSaved: ()
     <div className="rounded-xl border border-ink/10 bg-white p-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2"><label className={label}>Nama perniagaan (berdaftar)</label>
-          <input className={input} value={b.namaSah} onChange={(e) => set("namaSah", e.target.value)} placeholder="cth: Melecun Kabinet Sdn Bhd" /></div>
+          <input className={input} value={b.namaSah} onChange={(e) => set("namaSah", e.target.value)} placeholder="cth: Nama Syarikat Anda Sdn Bhd" /></div>
         <div><label className={label}>Jenis entiti</label>
           <select className={input} value={b.jenisEntiti} onChange={(e) => set("jenisEntiti", e.target.value)}>
             <option value="">Pilih…</option>

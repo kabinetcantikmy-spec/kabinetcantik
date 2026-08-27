@@ -1,5 +1,6 @@
 "use server";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
+import poskodData from "@/data/poskod.json";
 
 type Res = { ok: boolean; error?: string };
 
@@ -45,4 +46,14 @@ export async function submitMarketplaceLead(input: {
   });
   if (error) return { ok: false, error: error.message };
   return { ok: true };
+}
+
+type PoskodMap = Record<string, { c: string; s: string }>;
+
+/** Auto-detect kawasan & negeri dari poskod (server-side; data tak dihantar ke client). */
+export async function lookupPoskod(poskod: string): Promise<{ kawasan: string; negeri: string } | null> {
+  const p = (poskod || "").trim();
+  if (!/^\d{5}$/.test(p)) return null;
+  const hit = (poskodData as PoskodMap)[p];
+  return hit ? { kawasan: hit.c, negeri: hit.s } : null;
 }

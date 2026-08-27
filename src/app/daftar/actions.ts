@@ -3,7 +3,7 @@ import { createServiceClient, supabaseReady } from "@/lib/supabase";
 import { sendEmail, emailShell, emailReady } from "@/lib/email";
 
 /**
- * Pendaftaran SENDIRI (self-serve) untuk syarikat baru — trial 14 hari.
+ * Pendaftaran SENDIRI (self-serve) untuk syarikat baru — akses percuma (fasa launch).
  *
  * REQUIRE_VERIFY=true  → hantar emel pengesahan (Resend). Akaun tak boleh log
  *   masuk sampai emel disahkan. Pautan sahkan tuju ke /auth/callback kita guna
@@ -125,7 +125,7 @@ export async function registerTenant(input: RegisterInput): Promise<RegisterStat
        <p>Klik butang di bawah untuk sahkan emel & terus masuk panel anda:</p>
        <p style="margin:20px 0"><a href="${confirmUrl}" style="background:#AE873B;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;display:inline-block">Sahkan &amp; Masuk</a></p>
        <p style="font-size:13px;color:#9a9a9a">Butang tak jadi? Salin pautan ni ke pelayar:<br>${confirmUrl}</p>
-       <p style="font-size:13px;color:#9a9a9a">Trial percuma 14 hari bermula bila anda sahkan.</p>`
+       <p style="font-size:13px;color:#9a9a9a">Akaun percuma anda bermula sebaik anda sahkan.</p>`
     );
     const sent = await sendEmail({ to: email, subject: "Sahkan emel — KabinetCantik", html });
     if (!sent.ok) {

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
-import { submitMarketplaceLead } from "@/app/(site)/cari-kontraktor/actions";
+import Link from "next/link";
+import { submitMarketplaceLead, lookupPoskod } from "@/app/(site)/cari-kontraktor/actions";
 
 const KATEGORI = ["Kabinet dapur", "Wardrobe / almari", "Kabinet TV / feature wall", "Table top / island", "Kabinet lain"];
 const BAJET = ["Bawah RM5k", "RM5k – RM10k", "RM10k – RM20k", "RM20k – RM40k", "Lebih RM40k", "Belum pasti"];
@@ -10,6 +11,8 @@ const inputCls = "w-full rounded-lg border border-ink/15 bg-paper px-4 py-3";
 
 export default function LeadIntakeForm() {
   const [f, setF] = useState({ nama: "", telefon: "", emel: "", poskod: "", kawasan: "", kategori: "", bajet: "", timeline: "", keterangan: "" });
+  const [negeri, setNegeri] = useState("");
+  const [detecting, setDetecting] = useState(false);
   const [consent, setConsent] = useState(false);
   const [pending, startTransition] = useTransition();
   const [err, setErr] = useState("");
@@ -17,6 +20,23 @@ export default function LeadIntakeForm() {
 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setF((s) => ({ ...s, [k]: e.target.value }));
+
+  function onPoskod(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value.replace(/\D/g, "").slice(0, 5);
+    setF((s) => ({ ...s, poskod: v }));
+    setNegeri("");
+    if (v.length === 5) {
+      setDetecting(true);
+      lookupPoskod(v)
+        .then((r) => {
+          if (r) {
+            setF((s) => ({ ...s, kawasan: r.kawasan }));
+            setNegeri(r.negeri);
+          }
+        })
+        .finally(() => setDetecting(false));
+    }
+  }
 
   if (done) {
     return (
@@ -50,8 +70,12 @@ export default function LeadIntakeForm() {
         </div>
         <input type="email" value={f.emel} onChange={set("emel")} placeholder="Emel (pilihan)" className={inputCls} />
         <div className="grid gap-3 sm:grid-cols-2">
-          <input value={f.poskod} onChange={set("poskod")} inputMode="numeric" maxLength={5} placeholder="Poskod * (cth 40150)" className={inputCls} />
-          <input value={f.kawasan} onChange={set("kawasan")} placeholder="Kawasan (cth Shah Alam)" className={inputCls} />
+          <input value={f.poskod} onChange={onPoskod} inputMode="numeric" maxLength={5} placeholder="Poskod * (cth 40150)" className={inputCls} />
+          <div>
+            <input value={f.kawasan} onChange={set("kawasan")} placeholder="Kawasan" className={inputCls} />
+            {detecting && <p className="mt-1 text-xs text-ink/40">Mengesan kawasan…</p>}
+            {!detecting && negeri && <p className="mt-1 text-xs text-brass">✓ {f.kawasan}, {negeri}</p>}
+          </div>
         </div>
         <select value={f.kategori} onChange={set("kategori")} className={inputCls + (f.kategori ? "" : " text-ink/45")}>
           <option value="">Jenis kerja *</option>
@@ -71,7 +95,11 @@ export default function LeadIntakeForm() {
 
         <label className="flex items-start gap-2 text-xs text-ink/55">
           <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5" />
-          <span>Saya setuju maklumat ini dikongsi dengan <b>satu</b> kontraktor kabinet berdaftar KabinetCantik untuk menghubungi saya. (PDPA)</span>
+          <span>
+            Saya telah membaca &amp; bersetuju dengan{" "}
+            <Link href="/legal/terma-marketplace" target="_blank" className="font-medium text-brass underline">Terma Marketplace &amp; Notis PDPA</Link>,
+            dan memberi kebenaran untuk maklumat saya dikongsi dengan <b>satu</b> kontraktor kabinet berdaftar untuk menghubungi saya.
+          </span>
         </label>
 
         {err && <p className="text-sm text-red-600">{err}</p>}
