@@ -2,6 +2,37 @@
 import { useState } from "react";
 import { saveBranding, uploadBrandingLogo } from "@/app/admin/(panel)/tetapan/actions";
 
+// Kecilkan logo di client sebelum upload (kekalkan PNG untuk latar telus).
+async function downscaleLogo(file: File, maxDim = 800): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+  try {
+    const url = URL.createObjectURL(file);
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error("Gagal muat imej."));
+      i.src = url;
+    });
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+    if (scale >= 1 && file.size < 800_000) { URL.revokeObjectURL(url); return file; }
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { URL.revokeObjectURL(url); return file; }
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+    const isPng = file.type === "image/png";
+    const type = isPng ? "image/png" : "image/jpeg";
+    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, type, isPng ? undefined : 0.9));
+    return blob ? new File([blob], isPng ? "logo.png" : "logo.jpg", { type }) : file;
+  } catch {
+    return file;
+  }
+}
+
 export default function BrandingEditor({
   initial,
   orgId,
@@ -21,8 +52,9 @@ export default function BrandingEditor({
     setUploading(true);
     setMsg(null);
     try {
+      const blob = await downscaleLogo(f);
       const fd = new FormData();
-      fd.append("file", f);
+      fd.append("file", blob);
       const res = await uploadBrandingLogo(fd);
       if (!res.ok || !res.url) throw new Error(res.error || "gagal");
       setLogoUrl(res.url);

@@ -85,19 +85,23 @@ export async function uploadBrandingLogo(formData: FormData): Promise<{ ok: bool
   if (!staff.orgId) return { ok: false, error: "Tiada org untuk akaun ini." };
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) return { ok: false, error: "Tiada fail dipilih." };
-  if (file.size > 3 * 1024 * 1024) return { ok: false, error: "Saiz logo maksimum 3MB." };
-  const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
-  const path = `branding/${staff.orgId}/logo-${Date.now()}.${ext}`;
-  // Service-role — pintas storage RLS (admin authenticated tak diblok).
-  const sb = createServiceClient();
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const { error } = await sb.storage.from("lead-photos").upload(path, bytes, {
-    contentType: file.type || "image/png",
-    upsert: true,
-  });
-  if (error) return { ok: false, error: error.message };
-  const { data } = sb.storage.from("lead-photos").getPublicUrl(path);
-  return { ok: true, url: data?.publicUrl };
+  if (file.size > 8 * 1024 * 1024) return { ok: false, error: "Saiz logo maksimum 8MB." };
+  try {
+    const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
+    const path = `branding/${staff.orgId}/logo-${Date.now()}.${ext}`;
+    // Service-role — pintas storage RLS (admin authenticated tak diblok).
+    const sb = createServiceClient();
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const { error } = await sb.storage.from("lead-photos").upload(path, bytes, {
+      contentType: file.type || "image/png",
+      upsert: true,
+    });
+    if (error) return { ok: false, error: error.message };
+    const { data } = sb.storage.from("lead-photos").getPublicUrl(path);
+    return { ok: true, url: data?.publicUrl };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Muat naik logo gagal. Cuba imej lebih kecil." };
+  }
 }
 
 
