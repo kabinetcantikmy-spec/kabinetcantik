@@ -1,4 +1,5 @@
 import { supabaseReady } from "@/lib/supabase";
+import { guardLaunchLock } from "@/lib/launchGuard";
 import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { planForOrg } from "@/lib/planServer";
 import PlanLock from "@/components/admin/PlanLock";
@@ -7,6 +8,7 @@ import BlogEditor, { Post } from "@/components/admin/BlogEditor";
 export const dynamic = "force-dynamic";
 
 export default async function BlogAdminPage() {
+  await guardLaunchLock();
   const staff = await requireStaff();
   const { features } = await planForOrg(staff.orgId);
   if (!features.blog) return (<div><h1 className="h-display text-2xl">Blog</h1><PlanLock tier="Hero" feature="Blog & penerbitan artikel" /></div>);

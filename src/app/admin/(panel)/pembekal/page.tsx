@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { guardLaunchLock } from "@/lib/launchGuard";
 import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseServer";
 import { supabaseReady, createServiceClient } from "@/lib/supabase";
 import { planForOrg } from "@/lib/planServer";
@@ -7,6 +8,7 @@ import SupplierAdmin, { SupplierRow, ClaimRow, VoucherRow } from "@/components/a
 export const dynamic = "force-dynamic";
 
 export default async function PembekalAdminPage() {
+  await guardLaunchLock();
   await requireRole(["admin", "finance"]);
   const staff = await requireStaff();
   const { features } = await planForOrg(staff.orgId);

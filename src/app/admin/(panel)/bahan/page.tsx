@@ -1,10 +1,12 @@
 import { supabaseReady } from "@/lib/supabase";
+import { guardLaunchLock } from "@/lib/launchGuard";
 import { createSupabaseServer } from "@/lib/supabaseServer";
 import MaterialsEditor, { Material } from "@/components/admin/MaterialsEditor";
 
 export const dynamic = "force-dynamic";
 
 export default async function BahanPage() {
+  await guardLaunchLock();
   let materials: Material[] = [];
   if (supabaseReady()) {
     const sb = createSupabaseServer();

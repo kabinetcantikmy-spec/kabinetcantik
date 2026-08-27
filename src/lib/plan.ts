@@ -70,7 +70,7 @@ export const PLAN_FEATURES: Record<Plan, PlanFeatures> = {
     waAutomation: true,
     catalogUpload: true,
     blogReviews: true, // Ulasan terbuka
-    blog: false,       // Blog tersorok dulu
+    blog: true,        // ciri penuh; disorok & dikunci via nav+guard (fasa launch)
     removeBadge: false, // badge kekal
     customDomain: false,
     suppliers: true,

@@ -1,4 +1,5 @@
 import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseServer";
+import { guardLaunchLock } from "@/lib/launchGuard";
 import { supabaseReady } from "@/lib/supabase";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import { loadHomepageConfig } from "@/lib/homepageServer";
@@ -18,6 +19,7 @@ import TetapanSections from "@/components/admin/TetapanSections";
 export const dynamic = "force-dynamic";
 
 export default async function TetapanPage() {
+  await guardLaunchLock();
   await requireRole(["admin"]);
   const staff = await requireStaff();
   const config = await loadPricingConfig();

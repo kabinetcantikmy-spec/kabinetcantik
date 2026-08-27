@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { guardLaunchLock } from "@/lib/launchGuard";
 import { createSupabaseServer } from "@/lib/supabaseServer";
 import { supabaseReady } from "@/lib/supabase";
 import { fmtDate } from "@/lib/format";
@@ -15,6 +16,7 @@ interface CustomerRow {
 }
 
 export default async function PelangganPage() {
+  await guardLaunchLock();
   let customers: CustomerRow[] = [];
   if (supabaseReady()) {
     const sb = createSupabaseServer();

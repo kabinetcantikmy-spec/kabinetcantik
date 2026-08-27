@@ -13,7 +13,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const staff = await requireStaff();
   const brand = await tenantBrand(staff.orgId);
   const { features, plan } = await planForOrg(staff.orgId);
-  const navItems = adminNavItems(features, plan);
+  const navItems = adminNavItems(features, plan, staff.isPlatformAdmin);
   return (
     <div className="min-h-screen bg-paper">
       {/* Sidebar */}

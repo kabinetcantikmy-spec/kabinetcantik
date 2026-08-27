@@ -7,7 +7,7 @@ export interface NavItem { href: string; label: string; exact?: boolean }
  * (Kalendar, Bahan & Harga, Pelanggan, Pembekal, Ulasan, Blog, Tetapan/Laman Awam).
  * Butang yang disorok HILANG terus — tiada skrin upsell. Buka balik bila plan naik.
  */
-export function adminNavItems(features: PlanFeatures, plan?: Plan): NavItem[] {
+export function adminNavItems(features: PlanFeatures, plan?: Plan, isPlatformAdmin = false): NavItem[] {
   const items: NavItem[] = [
     { href: "/admin", label: "Dashboard", exact: true },
     { href: "/admin/leads-pasaran", label: "Leads Pasaran" },
@@ -24,7 +24,7 @@ export function adminNavItems(features: PlanFeatures, plan?: Plan): NavItem[] {
   if (features.blog) items.push({ href: "/admin/blog", label: "Blog" });
   items.push({ href: "/admin/tetapan", label: "Tetapan" });
 
-  if (plan === "launch") {
+  if (plan === "launch" && !isPlatformAdmin) {
     const hide = new Set([
       "/admin/kalendar",
       "/admin/bahan",

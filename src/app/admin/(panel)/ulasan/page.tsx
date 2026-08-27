@@ -1,4 +1,5 @@
 import { supabaseReady } from "@/lib/supabase";
+import { guardLaunchLock } from "@/lib/launchGuard";
 import { createSupabaseServer, requireStaff } from "@/lib/supabaseServer";
 import { planForOrg } from "@/lib/planServer";
 import PlanLock from "@/components/admin/PlanLock";
@@ -7,6 +8,7 @@ import ReviewsEditor, { Review } from "@/components/admin/ReviewsEditor";
 export const dynamic = "force-dynamic";
 
 export default async function UlasanAdminPage() {
+  await guardLaunchLock();
   const staff = await requireStaff();
   const { features } = await planForOrg(staff.orgId);
   if (!features.blogReviews) return (<div><h1 className="h-display text-2xl">Ulasan</h1><PlanLock tier="Hero" feature="Urus & terbit ulasan pelanggan" /></div>);

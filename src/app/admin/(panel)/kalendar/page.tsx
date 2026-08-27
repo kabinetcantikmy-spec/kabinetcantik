@@ -1,10 +1,12 @@
 import { supabaseReady } from "@/lib/supabase";
+import { guardLaunchLock } from "@/lib/launchGuard";
 import { createSupabaseServer } from "@/lib/supabaseServer";
 import AppointmentsManager, { Appt, LeadOpt } from "@/components/admin/AppointmentsManager";
 
 export const dynamic = "force-dynamic";
 
 export default async function KalendarPage() {
+  await guardLaunchLock();
   let appts: Appt[] = [];
   let leads: LeadOpt[] = [];
   if (supabaseReady()) {
