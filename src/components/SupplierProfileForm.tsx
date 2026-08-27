@@ -17,7 +17,8 @@ export interface SupplierProfile {
   dok_bank_url: string | null;
 }
 
-export default function SupplierProfileForm({ initial }: { initial: SupplierProfile }) {
+export default function SupplierProfileForm({ initial, jenis = "pembekal" }: { initial: SupplierProfile; jenis?: string }) {
+  const isInstaller = jenis === "installer";
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [f, setF] = useState({
@@ -74,16 +75,17 @@ export default function SupplierProfileForm({ initial }: { initial: SupplierProf
   return (
     <div className="rounded-xl border border-ink/10 bg-white p-5">
       <h2 className="font-display text-lg font-semibold text-ink">Profil KYB (Know-Your-Business)</h2>
-      <p className="mt-1 text-sm text-ink/50">Lengkapkan butiran perniagaan & muat naik dokumen untuk pengesahan. Dokumen disimpan sulit — hanya admin boleh lihat.</p>
+      <p className="mt-1 text-sm text-ink/50">Lengkapkan butiran & muat naik dokumen untuk pengesahan. Dokumen disimpan sulit — hanya admin boleh lihat.{isInstaller ? " (Installer individu: guna salinan IC ganti Sijil SSM.)" : ""}</p>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label className={label}>Nama syarikat berdaftar *</label>
+          <label className={label}>{isInstaller ? "Nama perniagaan / trading (jika ada)" : "Nama syarikat berdaftar *"}</label>
           <input className={inp} value={f.syarikat} onChange={(e) => set("syarikat", e.target.value)} />
         </div>
         <div>
-          <label className={label}>Jenis entiti *</label>
+          <label className={label}>Jenis entiti{isInstaller ? "" : " *"}</label>
           <select className={inp} value={f.jenis_entiti} onChange={(e) => set("jenis_entiti", e.target.value)}>
+            <option>Individu</option>
             <option>Sdn Bhd</option>
             <option>Enterprise</option>
             <option>Milikan Tunggal</option>
@@ -91,7 +93,7 @@ export default function SupplierProfileForm({ initial }: { initial: SupplierProf
           </select>
         </div>
         <div>
-          <label className={label}>No. Pendaftaran SSM *</label>
+          <label className={label}>{isInstaller ? "No. SSM (jika ada)" : "No. Pendaftaran SSM *"}</label>
           <input className={inp} value={f.no_ssm} onChange={(e) => set("no_ssm", e.target.value)} />
         </div>
         <div>
@@ -122,7 +124,7 @@ export default function SupplierProfileForm({ initial }: { initial: SupplierProf
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <div className="rounded-lg border border-ink/10 p-3">
-          <div className={label}>Sijil SSM * (gambar / PDF)</div>
+          <div className={label}>{isInstaller ? "Salinan IC * (gambar / PDF)" : "Sijil SSM * (gambar / PDF)"}</div>
           <div className="mt-2 flex items-center gap-2">
             <span className={`text-xs ${ssmDone ? "text-emerald-600" : "text-ink/40"}`}>{ssmDone ? "Dimuat naik ✓" : "Belum ada"}</span>
             <label className="ml-auto cursor-pointer rounded-lg border border-ink/15 px-3 py-1.5 text-xs hover:bg-paper">

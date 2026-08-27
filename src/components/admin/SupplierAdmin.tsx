@@ -6,7 +6,7 @@ import { fmtDate } from "@/lib/format";
 import { setSupplierStatus, approveClaim, rejectClaim, markVoucherPaid } from "@/app/admin/(panel)/pembekal/actions";
 
 export interface SupplierRow { id: string; nama: string; syarikat: string | null; jenis: string; status: string; telefon: string | null; emel: string | null; no_ssm: string | null; bank: string | null; no_akaun: string | null; jenis_entiti?: string | null; alamat?: string | null; pemilik?: string | null; no_ic?: string | null; profil_lengkap?: boolean; dok_ssm_signed?: string | null; dok_bank_signed?: string | null }
-export interface ClaimRow { id: string; no_tuntutan: string; butiran: string | null; jumlah: number; status: string; created_at: string; suppliers?: { nama: string } | null }
+export interface ClaimRow { id: string; no_tuntutan: string; butiran: string | null; jumlah: number; status: string; created_at: string; url_dokumen?: string | null; invois_signed?: string | null; suppliers?: { nama: string } | null }
 export interface VoucherRow { id: string; no_baucer: string; jumlah: number; status: string; suppliers?: { nama: string } | null }
 
 const SS: Record<string, string> = { pending: "bg-amber-100 text-amber-700", diluluskan: "bg-green-100 text-green-700", ditolak: "bg-red-100 text-red-600" };
@@ -51,9 +51,9 @@ export default function SupplierAdmin({ suppliers, claims, vouchers }: { supplie
 
               {/* Dokumen KYB (signed URL) */}
               <div className="mt-3 flex flex-wrap gap-2">
-                {s.dok_ssm_signed
-                  ? <a href={s.dok_ssm_signed} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs text-brass hover:bg-paper">📄 Sijil SSM ↗</a>
-                  : <span className="rounded-lg border border-dashed border-ink/15 px-3 py-1.5 text-xs text-ink/40">Sijil SSM: tiada</span>}
+                {(() => { const docLabel = s.jenis === "installer" ? "Salinan IC" : "Sijil SSM"; return s.dok_ssm_signed
+                  ? <a href={s.dok_ssm_signed} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs text-brass hover:bg-paper">📄 {docLabel} ↗</a>
+                  : <span className="rounded-lg border border-dashed border-ink/15 px-3 py-1.5 text-xs text-ink/40">{docLabel}: tiada</span>; })()}
                 {s.dok_bank_signed
                   ? <a href={s.dok_bank_signed} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs text-brass hover:bg-paper">📄 Bukti bank ↗</a>
                   : <span className="rounded-lg border border-dashed border-ink/15 px-3 py-1.5 text-xs text-ink/40">Bukti bank: tiada</span>}
@@ -91,7 +91,10 @@ export default function SupplierAdmin({ suppliers, claims, vouchers }: { supplie
                 <tr key={c.id} className="border-t border-ink/5">
                   <td className="px-4 py-3 font-medium text-ink">{c.no_tuntutan}</td>
                   <td className="px-4 py-3 text-ink/70">{c.suppliers?.nama || "—"}</td>
-                  <td className="px-4 py-3 max-w-xs truncate text-ink/60">{c.butiran}</td>
+                  <td className="px-4 py-3 max-w-xs text-ink/60">
+                    <div className="truncate">{c.butiran}</div>
+                    {c.invois_signed && <a href={c.invois_signed} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-brass hover:underline">📄 Invois ↗</a>}
+                  </td>
                   <td className="px-4 py-3 text-right font-semibold text-ink">{rm2(c.jumlah)}</td>
                   <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-xs ${CS[c.status]}`}>{c.status}</span></td>
                   <td className="px-4 py-3 text-right">

@@ -25,6 +25,7 @@ const EMPTY_PROFILE: SupplierProfile = {
 export default async function SupplierDashboard() {
   const ctx = await requireSupplier();
   let status = "pending";
+  let jenis = "pembekal";
   let profilLengkap = false;
   let profile: SupplierProfile = EMPTY_PROFILE;
   let claims: Claim[] = [];
@@ -33,10 +34,11 @@ export default async function SupplierDashboard() {
     const sb = createServiceClient();
     const { data: sup } = await sb
       .from("suppliers")
-      .select("status, profil_lengkap, syarikat, jenis_entiti, no_ssm, telefon, alamat, pemilik, no_ic, bank, no_akaun, dok_ssm_url, dok_bank_url")
+      .select("status, profil_lengkap, jenis, syarikat, jenis_entiti, no_ssm, telefon, alamat, pemilik, no_ic, bank, no_akaun, dok_ssm_url, dok_bank_url")
       .eq("id", ctx.supplierId)
       .single();
     status = sup?.status || "pending";
+    jenis = (sup?.jenis as string) || "pembekal";
     profilLengkap = sup?.profil_lengkap === true;
     if (sup) profile = sup as unknown as SupplierProfile;
     const [{ data: c }, { data: v }] = await Promise.all([
@@ -65,11 +67,11 @@ export default async function SupplierDashboard() {
       <div className={`mt-4 rounded-xl p-4 text-sm ${banner.cls}`}>{banner.text}</div>
 
       {canClaim && (
-        <div className="mt-6"><ClaimForm /></div>
+        <div className="mt-6"><ClaimForm jenis={jenis} /></div>
       )}
 
       {!profilLengkap && (
-        <div className="mt-6"><SupplierProfileForm initial={profile} /></div>
+        <div className="mt-6"><SupplierProfileForm initial={profile} jenis={jenis} /></div>
       )}
 
       {/* Claims */}
@@ -122,7 +124,7 @@ export default async function SupplierDashboard() {
       {profilLengkap && (
         <div className="mt-8">
           <h2 className="mb-3 font-display text-lg font-semibold text-ink">Kemaskini profil KYB</h2>
-          <SupplierProfileForm initial={profile} />
+          <SupplierProfileForm initial={profile} jenis={jenis} />
         </div>
       )}
     </div>

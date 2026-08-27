@@ -11,9 +11,10 @@ export async function submitClaim(input: { butiran: string; jumlah: number; url_
   if (!input.butiran.trim() || !input.jumlah || input.jumlah <= 0) return { ok: false, error: "Butiran & jumlah wajib." };
   const sb = createServiceClient();
 
-  const { data: sup } = await sb.from("suppliers").select("status, profil_lengkap").eq("id", ctx.supplierId).single();
-  if (sup?.profil_lengkap !== true) return { ok: false, error: "Lengkapkan profil KYB (termasuk dokumen Sijil SSM & bukti bank) dahulu sebelum hantar tuntutan." };
+  const { data: sup } = await sb.from("suppliers").select("status, profil_lengkap, jenis").eq("id", ctx.supplierId).single();
+  if (sup?.profil_lengkap !== true) return { ok: false, error: "Lengkapkan profil KYB dahulu sebelum hantar tuntutan." };
   if (sup?.status !== "diluluskan") return { ok: false, error: "Akaun anda belum diluluskan." };
+  if (sup?.jenis === "installer" && !(input.url_dokumen || "").trim()) return { ok: false, error: "Installer wajib lampirkan invois untuk tuntutan progress." };
 
   const { count } = await sb.from("supplier_claims").select("*", { count: "exact", head: true });
   const noTuntutan = `CLM-${new Date().getFullYear()}-${String((count || 0) + 1).padStart(4, "0")}`;
@@ -35,10 +36,14 @@ export async function submitClaim(input: { butiran: string; jumlah: number; url_
 async function recomputeLengkap(sb: ReturnType<typeof createServiceClient>, supplierId: string) {
   const { data: r } = await sb
     .from("suppliers")
-    .select("syarikat, no_ssm, alamat, pemilik, no_ic, bank, no_akaun, dok_ssm_url, dok_bank_url")
+    .select("jenis, syarikat, no_ssm, alamat, pemilik, no_ic, bank, no_akaun, dok_ssm_url, dok_bank_url")
     .eq("id", supplierId)
     .single();
-  const lengkap = !!(r && r.syarikat && r.no_ssm && r.alamat && r.pemilik && r.no_ic && r.bank && r.no_akaun && r.dok_ssm_url && r.dok_bank_url);
+  // dok_ssm_url = dokumen identiti (Sijil SSM utk pembekal, salinan IC utk installer).
+  const common = !!(r && r.alamat && r.pemilik && r.no_ic && r.bank && r.no_akaun && r.dok_ssm_url && r.dok_bank_url);
+  const lengkap = r?.jenis === "installer"
+    ? common                                    // installer: IC + bank; SSM/syarikat tak wajib
+    : common && !!(r?.syarikat && r?.no_ssm);   // pembekal: + nama syarikat + No. SSM
   await sb.from("suppliers").update({ profil_lengkap: lengkap }).eq("id", supplierId);
   return lengkap;
 }
@@ -99,6 +104,28 @@ export async function uploadSupplierDoc(formData: FormData): Promise<{ ok: boole
     const lengkap = await recomputeLengkap(sb, ctx.supplierId);
     revalidatePath("/pembekal");
     return { ok: true, lengkap };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Muat naik gagal." };
+  }
+}
+
+// Muat naik invois tuntutan (installer/pembekal) ke bucket privat; pulang PATH.
+export async function uploadClaimDoc(formData: FormData): Promise<{ ok: boolean; error?: string; path?: string }> {
+  const ctx = await requireSupplier();
+  if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) return { ok: false, error: "Tiada fail dipilih." };
+  if (file.size > 10 * 1024 * 1024) return { ok: false, error: "Saiz maksimum 10MB." };
+  const okType = file.type.startsWith("image/") || file.type === "application/pdf";
+  if (!okType) return { ok: false, error: "Hanya gambar atau PDF dibenarkan." };
+  try {
+    const ext = (file.name.split(".").pop() || "pdf").toLowerCase().replace(/[^a-z0-9]/g, "") || "pdf";
+    const path = `${ctx.supplierId}/invois-${Date.now()}.${ext}`;
+    const sb = createServiceClient();
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const { error } = await sb.storage.from("supplier-docs").upload(path, bytes, { contentType: file.type || "application/octet-stream", upsert: true });
+    if (error) return { ok: false, error: error.message };
+    return { ok: true, path };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Muat naik gagal." };
   }
