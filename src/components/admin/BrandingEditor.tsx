@@ -88,7 +88,7 @@ export default function BrandingEditor({
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={label}>Nama syarikat</label>
+          <label className={label}>Nama brand / jenama anda</label>
           <input className={input} value={nama} onChange={(e) => setNama(e.target.value)} />
         </div>
         <div>

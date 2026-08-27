@@ -1,13 +1,13 @@
-import type { PlanFeatures } from "@/lib/plan";
+import type { PlanFeatures, Plan } from "@/lib/plan";
 
 export interface NavItem { href: string; label: string; exact?: boolean }
 
 /**
- * Senarai nav admin ikut ciri pakej. Fasa percuma = semua terbuka KECUALI Blog
- * (Blog dikawal features.blogReviews → freemium sorok, muncul bila dibuka).
- * Butang yang tak layak HILANG terus — tiada skrin "upgrade" / kunci.
+ * Nav admin. Fasa percuma ("launch") = fokus lead + jualan; sorok ciri kompleks
+ * (Kalendar, Bahan & Harga, Pelanggan, Pembekal, Ulasan, Blog, Tetapan/Laman Awam).
+ * Butang yang disorok HILANG terus — tiada skrin upsell. Buka balik bila plan naik.
  */
-export function adminNavItems(features: PlanFeatures): NavItem[] {
+export function adminNavItems(features: PlanFeatures, plan?: Plan): NavItem[] {
   const items: NavItem[] = [
     { href: "/admin", label: "Dashboard", exact: true },
     { href: "/admin/leads-pasaran", label: "Leads Pasaran" },
@@ -23,5 +23,18 @@ export function adminNavItems(features: PlanFeatures): NavItem[] {
   ];
   if (features.blog) items.push({ href: "/admin/blog", label: "Blog" });
   items.push({ href: "/admin/tetapan", label: "Tetapan" });
+
+  if (plan === "launch") {
+    const hide = new Set([
+      "/admin/kalendar",
+      "/admin/bahan",
+      "/admin/pelanggan",
+      "/admin/pembekal",
+      "/admin/ulasan",
+      "/admin/blog",
+      "/admin/tetapan",
+    ]);
+    return items.filter((i) => !hide.has(i.href));
+  }
   return items;
 }

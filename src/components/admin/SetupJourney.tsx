@@ -57,7 +57,7 @@ export default function SetupJourney({ orgId, business, steps: initialSteps, bra
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-ink/10">
           <div className="h-full rounded-full bg-brass transition-all" style={{ width: `${(doneCount / SETUP_STEPS.length) * 100}%` }} />
         </div>
-        <div className="mt-4 grid grid-cols-5 gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-2">
           {SETUP_STEPS.map((s, idx) => {
             const done = steps[s.key];
             const active = idx === i;
@@ -86,7 +86,7 @@ export default function SetupJourney({ orgId, business, steps: initialSteps, bra
           {step.key === "jenama" && (
             <>
               <BrandingEditor initial={brand} orgId={orgId} />
-              <NavButtons busy={busy} showBack onBack={() => setI((x) => x - 1)} onNext={() => next("jenama")} />
+              <NavButtons busy={busy} showBack nextLabel="Selesai & Lancarkan Kedai" onBack={() => setI((x) => x - 1)} onNext={() => next("jenama")} />
             </>
           )}
           {step.key === "laman" && (

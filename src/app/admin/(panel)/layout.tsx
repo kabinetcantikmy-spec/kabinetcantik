@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const staff = await requireStaff();
   const brand = await tenantBrand(staff.orgId);
-  const { features } = await planForOrg(staff.orgId);
-  const navItems = adminNavItems(features);
+  const { features, plan } = await planForOrg(staff.orgId);
+  const navItems = adminNavItems(features, plan);
   return (
     <div className="min-h-screen bg-paper">
       {/* Sidebar */}

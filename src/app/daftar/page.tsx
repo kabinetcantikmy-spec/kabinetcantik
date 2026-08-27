@@ -53,7 +53,7 @@ export default function DaftarPage() {
         router.push("/admin/login?daftar=ok");
         return;
       }
-      router.push("/admin");
+      router.push("/admin/setup");
       router.refresh();
     } catch {
       setErr("Ada masalah. Cuba lagi sekejap.");
