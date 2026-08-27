@@ -125,6 +125,38 @@ export default function HomepageEditor({ initial }: { initial: HomepageConfig })
       <h2 className="font-display text-lg font-semibold">Laman Awam (Homepage)</h2>
       <p className="mt-1 text-sm text-ink/50">Teks & maklumat yang dipapar di laman utama syarikat anda.</p>
 
+      {/* Pratonton langsung Hero — berubah masa anda menaip */}
+      <div className="mt-4">
+        <div className="mb-2 flex items-center gap-2 text-xs font-medium text-ink/60">
+          <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" /> Pratonton langsung (Hero)
+        </div>
+        <div className="relative overflow-hidden rounded-xl border border-ink/10 bg-ink" style={{ aspectRatio: "16 / 9" }}>
+          {c.heroImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={c.heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/30" />
+          <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6">
+            {c.heroEyebrow && <p className="text-[10px] font-semibold uppercase tracking-widest text-brass-lite sm:text-xs">{c.heroEyebrow}</p>}
+            <h3 className="mt-1 font-display text-lg font-semibold leading-tight text-off-white sm:text-2xl">{c.heroTitle || "Tajuk utama anda"}</h3>
+            {c.heroTagline && <p className="mt-1 font-serif text-xs italic text-tan sm:text-sm">{c.heroTagline}</p>}
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className="rounded-md bg-brass px-3 py-1 text-[10px] font-semibold text-ink sm:text-xs">{c.heroCta1 || "Butang 1"}</span>
+              <span className="rounded-md border border-white/40 px-3 py-1 text-[10px] font-semibold text-off-white sm:text-xs">{c.heroCta2 || "Butang 2"}</span>
+            </div>
+            <div className="mt-3 grid max-w-md grid-cols-3 gap-2 border-t border-white/15 pt-2">
+              {c.stats.slice(0, 3).map((st, i) => (
+                <div key={i}>
+                  <div className="font-display text-sm font-semibold text-tan">{st.n}</div>
+                  <div className="text-[9px] uppercase tracking-wider text-white/60">{st.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <p className="mt-1 text-[11px] text-ink/40">Pratonton berubah masa anda menaip. Tekan &quot;Simpan Laman&quot; untuk terbitkan ke laman sebenar.</p>
+      </div>
+
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label className={label}>Eyebrow (baris kecil atas tajuk)</label>

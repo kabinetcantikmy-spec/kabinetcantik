@@ -13,6 +13,7 @@ import PortfolioPageEditor from "@/components/admin/PortfolioPageEditor";
 import BlogPageEditor from "@/components/admin/BlogPageEditor";
 import ContactPageEditor from "@/components/admin/ContactPageEditor";
 import PrivacyPageEditor from "@/components/admin/PrivacyPageEditor";
+import TetapanSections from "@/components/admin/TetapanSections";
 
 export const dynamic = "force-dynamic";
 
@@ -42,16 +43,30 @@ export default async function TetapanPage() {
     <div>
       <h1 className="h-display text-2xl">Tetapan</h1>
       <p className="mt-1 text-sm text-ink/50">Kadar harga, cukai, deposit & pengurusan pengguna (admin sahaja).</p>
-      <div className="mt-6 space-y-6">
-        <BrandingEditor initial={{ nama: brand.nama, logoUrl: brand.logoUrl }} orgId={staff.orgId || ""} />
-        <HomepageEditor initial={homepage} />
-        <ServicesEditor initial={services} />
-        <MaterialsPageEditor initial={materials} />
-        <PortfolioPageEditor initial={portfolioPage} />
-        <BlogPageEditor initial={blogPage} />
-        <ContactPageEditor initial={contactPage} />
-        <PrivacyPageEditor initial={privacyPage} />
-        <SettingsEditor config={config} users={users} waEnabled={waEnabled} />
+      <div className="mt-6">
+        <TetapanSections
+          labels={[
+            "Jenama & Logo",
+            "Homepage (Laman Awam)",
+            "Perkhidmatan",
+            "Bahan & Kemasan",
+            "Portfolio",
+            "Blog",
+            "Hubungi (Contact)",
+            "Dasar Privasi",
+            "Kadar, Pengguna & WhatsApp",
+          ]}
+        >
+          <BrandingEditor initial={{ nama: brand.nama, logoUrl: brand.logoUrl }} orgId={staff.orgId || ""} />
+          <HomepageEditor initial={homepage} />
+          <ServicesEditor initial={services} />
+          <MaterialsPageEditor initial={materials} />
+          <PortfolioPageEditor initial={portfolioPage} />
+          <BlogPageEditor initial={blogPage} />
+          <ContactPageEditor initial={contactPage} />
+          <PrivacyPageEditor initial={privacyPage} />
+          <SettingsEditor config={config} users={users} waEnabled={waEnabled} />
+        </TetapanSections>
       </div>
     </div>
   );
