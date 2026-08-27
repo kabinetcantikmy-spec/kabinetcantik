@@ -63,7 +63,6 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
   };
   const wizardRows: [string, string][] = Object.keys(w).length
     ? [
-        ["Kategori", CAT_LABEL[w.option as string] || (w.option ? String(w.option) : "—")],
         ["Bahan", TIER_LABEL[w.tier as string] || (w.tier ? String(w.tier) : "—")],
         ["Saiz", saizText(w.qtys)],
         ["Bajet", w.budget ? String(w.budget) : "—"],
@@ -72,6 +71,7 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
     : [];
   const SOURCE_LABEL: Record<string, string> = { quote_wizard: "Website", website: "Website", manual: "Manual" };
   const sumberText = SOURCE_LABEL[l.source as string] || (l.source ? String(l.source) : "—");
+  const catText = (l.kategori || []).map((k: string) => CAT_LABEL[k] || String(k)).filter((v: string, i: number, a: string[]) => a.indexOf(v) === i).join(", ") || "—";
   const wa = waLink(l.telefon, `Hai ${l.nama}, terima kasih hubungi ${brand.nama}.`);
 
   return (
@@ -93,7 +93,7 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
               <Info label="Peringkat" value={l.stage} />
               <Info label="Sumber" value={sumberText} />
-              <Info label="Kategori" value={(l.kategori || []).join(", ") || "—"} />
+              <Info label="Kategori" value={catText} />
               <Info label="Anggaran" value={l.budget_max ? `${rm(l.budget_min)} – ${rm(l.budget_max)}` : "—"} />
               <Info label="Timeline" value={String((wizard as Record<string, unknown>).timeline || l.timeline || "—")} />
               <Info label="Masuk" value={fmtDate(l.created_at)} />
@@ -112,7 +112,7 @@ export default async function LeadDetail(props: { params: Promise<{ id: string }
             )}
             {wizardRows.length > 0 && (
               <details className="mt-4 text-sm" open>
-                <summary className="cursor-pointer text-ink/60">Jawapan wizard</summary>
+                <summary className="cursor-pointer text-ink/60">Butiran ukuran & bahan</summary>
                 <div className="mt-2 space-y-1 rounded-lg bg-paper p-3">
                   {wizardRows.map(([k, v]) => (
                     <div key={k} className="flex gap-3">

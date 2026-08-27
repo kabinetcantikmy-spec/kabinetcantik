@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient, supabaseReady } from "@/lib/supabase";
-import { waSalesLink } from "@/lib/wa";
+import { waSalesLink, waLink } from "@/lib/wa";
 import { waLeadWelcome } from "@/lib/whatsapp";
 import { resolveOrgId } from "@/lib/tenant";
 import { tenantBrand } from "@/lib/branding";
@@ -97,12 +97,25 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Mesej WhatsApp untuk sales follow-up (satu-klik).
-  const estText = est ? ` Anggaran: RM${est.low.toLocaleString()}–RM${est.high.toLocaleString()}.` : "";
-  const brand = await tenantBrand(orgId);
-  const waLink = waSalesLink(
-    `Lead baru ${brand.nama}:\nNama: ${nama}\nTel: ${telefon}\nKategori: ${(body.kategori || []).join(", ")}.${estText}`
-  );
+  // Nombor WhatsApp TENANT (bukan global). Sumber: business.telefon -> homepage.whatsapp.
+  let tenantWa = "";
+  if (supabaseReady() && orgId) {
+    try {
+      const sb = createServiceClient();
+      const { data } = await sb.from("settings").select("key, value").eq("org_id", orgId).in("key", ["business", "homepage"]);
+      const rows = (data || []) as { key: string; value: Record<string, unknown> | null }[];
+      const biz = rows.find((r) => r.key === "business")?.value as { telefon?: string } | undefined;
+      const hp = rows.find((r) => r.key === "homepage")?.value as { whatsapp?: string } | undefined;
+      tenantWa = String(biz?.telefon || hp?.whatsapp || "").trim();
+    } catch { /* ignore */ }
+  }
 
-  return NextResponse.json({ ok: true, waLink });
+  const estText = est ? ` Anggaran awal: RM${est.low.toLocaleString()}–RM${est.high.toLocaleString()}.` : "";
+  const brand = await tenantBrand(orgId);
+  // Mesej dari sudut pelanggan (klik "Sambung di WhatsApp" pada skrin terima kasih).
+  const custMsg = `Hai ${brand.nama}, saya ${nama}. Saya baru hantar permintaan sebut harga (${(body.kategori || []).join(", ")}).${estText} Boleh bincang lanjut?`;
+  // Guna nombor tenant jika ada; jika tenant belum set, fallback ke nombor sales global.
+  const waLinkOut = tenantWa ? waLink(tenantWa, custMsg) : waSalesLink(custMsg);
+
+  return NextResponse.json({ ok: true, waLink: waLinkOut });
 }
