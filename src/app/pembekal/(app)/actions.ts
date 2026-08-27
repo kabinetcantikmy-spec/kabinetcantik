@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 type Res = { ok: boolean; error?: string };
 
-export async function submitClaim(input: { butiran: string; jumlah: number; url_dokumen?: string }): Promise<Res> {
+export async function submitClaim(input: { butiran: string; jumlah: number; url_dokumen?: string; url_do?: string }): Promise<Res> {
   const ctx = await requireSupplier();
   if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
   if (!input.butiran.trim() || !input.jumlah || input.jumlah <= 0) return { ok: false, error: "Butiran & jumlah wajib." };
@@ -14,7 +14,12 @@ export async function submitClaim(input: { butiran: string; jumlah: number; url_
   const { data: sup } = await sb.from("suppliers").select("status, profil_lengkap, jenis").eq("id", ctx.supplierId).single();
   if (sup?.profil_lengkap !== true) return { ok: false, error: "Lengkapkan profil KYB dahulu sebelum hantar tuntutan." };
   if (sup?.status !== "diluluskan") return { ok: false, error: "Akaun anda belum diluluskan." };
-  if (sup?.jenis === "installer" && !(input.url_dokumen || "").trim()) return { ok: false, error: "Installer wajib lampirkan invois untuk tuntutan progress." };
+  if (sup?.jenis === "installer") {
+    if (!(input.url_dokumen || "").trim()) return { ok: false, error: "Installer wajib lampirkan invois untuk tuntutan progress." };
+  } else {
+    if (!(input.url_do || "").trim()) return { ok: false, error: "Pembekal wajib lampirkan Nota Penghantaran (DO)." };
+    if (!(input.url_dokumen || "").trim()) return { ok: false, error: "Pembekal wajib lampirkan invois." };
+  }
 
   const { count } = await sb.from("supplier_claims").select("*", { count: "exact", head: true });
   const noTuntutan = `CLM-${new Date().getFullYear()}-${String((count || 0) + 1).padStart(4, "0")}`;
@@ -25,6 +30,7 @@ export async function submitClaim(input: { butiran: string; jumlah: number; url_
     butiran: input.butiran.trim(),
     jumlah: input.jumlah,
     url_dokumen: input.url_dokumen || null,
+    url_do: input.url_do || null,
     status: "baru",
   });
   if (error) return { ok: false, error: error.message };

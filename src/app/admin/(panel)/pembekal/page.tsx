@@ -32,7 +32,7 @@ export default async function PembekalAdminPage() {
     const sb = createSupabaseServer();
     const [{ data: s }, { data: c }, { data: v }] = await Promise.all([
       sb.from("suppliers").select("*").order("created_at", { ascending: false }),
-      sb.from("supplier_claims").select("id, no_tuntutan, butiran, jumlah, status, created_at, url_dokumen, suppliers(nama)").order("created_at", { ascending: false }),
+      sb.from("supplier_claims").select("id, no_tuntutan, butiran, jumlah, status, created_at, url_dokumen, url_do, suppliers(nama)").order("created_at", { ascending: false }),
       sb.from("vouchers").select("id, no_baucer, jumlah, status, suppliers(nama)").order("created_at", { ascending: false }),
     ]);
     // Jana signed URL untuk dokumen KYB (bucket privat) — service-role sebab bucket privat; page ni admin-only. Sah 1 jam.
@@ -48,9 +48,14 @@ export default async function PembekalAdminPage() {
     claims = await Promise.all(((c || []) as Record<string, unknown>[]).map(async (row) => {
       const out = { ...row } as unknown as ClaimRow;
       const doc = row.url_dokumen as string | null;
+      const doDoc = row.url_do as string | null;
       if (doc) {
         if (/^https?:\/\//i.test(doc)) out.invois_signed = doc;
         else { const { data: d } = await svc.storage.from("supplier-docs").createSignedUrl(doc, 3600); out.invois_signed = d?.signedUrl || null; }
+      }
+      if (doDoc) {
+        if (/^https?:\/\//i.test(doDoc)) out.do_signed = doDoc;
+        else { const { data: d } = await svc.storage.from("supplier-docs").createSignedUrl(doDoc, 3600); out.do_signed = d?.signedUrl || null; }
       }
       return out;
     }));
