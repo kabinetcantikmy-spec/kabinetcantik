@@ -9,6 +9,7 @@ export default function LeadsPasaranBoard({ leads, usage }: { leads: BoardLead[]
   const [used, setUsed] = useState(usage.used);
   const [revealed, setRevealed] = useState<Record<string, Revealed>>({});
   const [gone, setGone] = useState<Set<string>>(new Set());
+  const [items] = useState(leads); // snapshot — kekalkan kad walau server refresh
   const [q, setQ] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -19,12 +20,12 @@ export default function LeadsPasaranBoard({ leads, usage }: { leads: BoardLead[]
 
   const shown = useMemo(() => {
     const s = q.trim().toLowerCase();
-    return leads.filter((l) => {
+    return items.filter((l) => {
       if (gone.has(l.id) && !revealed[l.id]) return false;
       if (!s) return true;
       return (l.poskod || "").toLowerCase().includes(s) || (l.kawasan || "").toLowerCase().includes(s);
     });
-  }, [leads, q, gone, revealed]);
+  }, [items, q, gone, revealed]);
 
   function buka(id: string) {
     if (habis || pendingId) return;

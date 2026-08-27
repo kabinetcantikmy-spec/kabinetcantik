@@ -5,7 +5,7 @@ import LeadIntakeForm from "@/components/LeadIntakeForm";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Cari Pembuat Kabinet Dipercayai | KabinetCantik",
+  title: "Cari Pembuat Kabinet Dipercayai",
   description: "Isi sekali — kami hubungkan anda dengan kontraktor kabinet berdaftar di kawasan anda. Percuma.",
 };
 

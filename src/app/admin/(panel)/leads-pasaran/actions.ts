@@ -10,7 +10,6 @@ export async function claimMarketplaceLead(leadId: string): Promise<ClaimResult>
   const { plan } = await planForOrg(staff.orgId);
   const r = await claimLead({ orgId: staff.orgId, userId: staff.userId, staffName: staff.nama, leadId, plan });
   if (r.ok) {
-    revalidatePath("/admin/leads-pasaran");
     revalidatePath("/admin/leads");
   }
   return r;
