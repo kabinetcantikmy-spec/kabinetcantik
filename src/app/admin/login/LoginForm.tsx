@@ -22,7 +22,14 @@ export default function AdminLoginForm({ brand }: { brand: { nama: string; logoU
       router.push("/admin");
       router.refresh();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Log masuk gagal.");
+      const raw = (e instanceof Error ? e.message : "").toLowerCase();
+      setErr(
+        raw.includes("invalid login") || raw.includes("credentials")
+          ? "Emel atau kata laluan salah."
+          : raw.includes("email not confirmed")
+            ? "Emel belum disahkan."
+            : (e instanceof Error ? e.message : "Log masuk gagal. Cuba lagi.")
+      );
     } finally {
       setBusy(false);
     }

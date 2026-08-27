@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowser } from "@/lib/supabaseBrowser";
 import Logo from "@/components/Logo";
 
-export default function SupplierLoginForm({ brand }: { brand: { nama: string; logoUrl: string } }) {
+export default function SupplierLoginForm({ brand, notice = "" }: { brand: { nama: string; logoUrl: string }; notice?: string }) {
   const router = useRouter();
   const [emel, setEmel] = useState("");
   const [kata, setKata] = useState("");
@@ -23,7 +23,14 @@ export default function SupplierLoginForm({ brand }: { brand: { nama: string; lo
       router.push("/pembekal");
       router.refresh();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Log masuk gagal.");
+      const raw = (e instanceof Error ? e.message : "").toLowerCase();
+      setErr(
+        raw.includes("invalid login") || raw.includes("credentials")
+          ? "Emel atau kata laluan salah. Kalau belum daftar, tekan \u201cDaftar di sini\u201d di bawah."
+          : raw.includes("email not confirmed")
+            ? "Emel belum disahkan. Semak inbox anda."
+            : (e instanceof Error ? e.message : "Log masuk gagal. Cuba lagi.")
+      );
     } finally {
       setBusy(false);
     }
@@ -37,6 +44,7 @@ export default function SupplierLoginForm({ brand }: { brand: { nama: string; lo
           <h1 className="mt-4 font-display text-xl font-semibold tracking-wide text-ink">{brand.nama}</h1>
           <p className="text-sm text-ink/50">Portal Pembekal & Installer</p>
         </div>
+        {notice && <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">{notice}</p>}
         <div className="mt-6 space-y-3">
           <input type="email" required value={emel} onChange={(e) => setEmel(e.target.value)} placeholder="Emel" className="w-full rounded-lg border border-ink/15 bg-paper px-4 py-3" />
           <input type="password" required value={kata} onChange={(e) => setKata(e.target.value)} placeholder="Kata laluan" className="w-full rounded-lg border border-ink/15 bg-paper px-4 py-3" />

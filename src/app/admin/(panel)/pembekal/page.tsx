@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseServer";
-import { supabaseReady } from "@/lib/supabase";
+import { supabaseReady, createServiceClient } from "@/lib/supabase";
 import { planForOrg } from "@/lib/planServer";
 import SupplierAdmin, { SupplierRow, ClaimRow, VoucherRow } from "@/components/admin/SupplierAdmin";
 
@@ -35,13 +35,14 @@ export default async function PembekalAdminPage() {
       sb.from("supplier_claims").select("id, no_tuntutan, butiran, jumlah, status, created_at, suppliers(nama)").order("created_at", { ascending: false }),
       sb.from("vouchers").select("id, no_baucer, jumlah, status, suppliers(nama)").order("created_at", { ascending: false }),
     ]);
-    // Jana signed URL untuk dokumen KYB (bucket privat) — sah 1 jam, admin sahaja.
+    // Jana signed URL untuk dokumen KYB (bucket privat) — service-role sebab bucket privat; page ni admin-only. Sah 1 jam.
+    const svc = createServiceClient();
     suppliers = await Promise.all(((s || []) as Record<string, unknown>[]).map(async (row) => {
       const out = { ...row } as unknown as SupplierRow;
       const ssmPath = row.dok_ssm_url as string | null;
       const bankPath = row.dok_bank_url as string | null;
-      if (ssmPath) { const { data: d } = await sb.storage.from("supplier-docs").createSignedUrl(ssmPath, 3600); out.dok_ssm_signed = d?.signedUrl || null; }
-      if (bankPath) { const { data: d } = await sb.storage.from("supplier-docs").createSignedUrl(bankPath, 3600); out.dok_bank_signed = d?.signedUrl || null; }
+      if (ssmPath) { const { data: d } = await svc.storage.from("supplier-docs").createSignedUrl(ssmPath, 3600); out.dok_ssm_signed = d?.signedUrl || null; }
+      if (bankPath) { const { data: d } = await svc.storage.from("supplier-docs").createSignedUrl(bankPath, 3600); out.dok_bank_signed = d?.signedUrl || null; }
       return out;
     }));
     claims = (c || []) as unknown as ClaimRow[];

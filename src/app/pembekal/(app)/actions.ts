@@ -11,7 +11,8 @@ export async function submitClaim(input: { butiran: string; jumlah: number; url_
   if (!input.butiran.trim() || !input.jumlah || input.jumlah <= 0) return { ok: false, error: "Butiran & jumlah wajib." };
   const sb = createServiceClient();
 
-  const { data: sup } = await sb.from("suppliers").select("status").eq("id", ctx.supplierId).single();
+  const { data: sup } = await sb.from("suppliers").select("status, profil_lengkap").eq("id", ctx.supplierId).single();
+  if (sup?.profil_lengkap !== true) return { ok: false, error: "Lengkapkan profil KYB (termasuk dokumen Sijil SSM & bukti bank) dahulu sebelum hantar tuntutan." };
   if (sup?.status !== "diluluskan") return { ok: false, error: "Akaun anda belum diluluskan." };
 
   const { count } = await sb.from("supplier_claims").select("*", { count: "exact", head: true });

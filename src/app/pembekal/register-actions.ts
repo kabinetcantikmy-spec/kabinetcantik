@@ -33,7 +33,9 @@ export async function registerSupplier(input: {
     email_confirm: true,
   });
   if (authErr || !created?.user) {
-    return { ok: false, error: authErr?.message || "Emel mungkin telah didaftarkan." };
+    const m = (authErr?.message || "").toLowerCase();
+    const dup = m.includes("already") || m.includes("registered") || m.includes("checking email") || m.includes("duplicate") || m.includes("exists");
+    return { ok: false, error: dup ? "Emel ini sudah mempunyai akaun. Guna emel lain, atau log masuk." : (authErr?.message || "Gagal cipta akaun. Cuba lagi.") };
   }
 
   // 2) Cipta rekod supplier (pending, profil belum lengkap)
