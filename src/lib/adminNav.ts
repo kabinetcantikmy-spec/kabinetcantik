@@ -27,7 +27,6 @@ export function adminNavItems(features: PlanFeatures, plan?: Plan, isPlatformAdm
   if (plan === "launch" && !isPlatformAdmin) {
     const hide = new Set([
       "/admin/kalendar",
-      "/admin/bahan",
       "/admin/pelanggan",
       "/admin/pembekal",
       "/admin/ulasan",
