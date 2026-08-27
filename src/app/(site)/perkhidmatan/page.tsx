@@ -1,23 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { SERVICES } from "@/data/services";
 import { BLUR } from "@/lib/img";
+import { currentOrg } from "@/lib/tenant";
+import { loadServices } from "@/lib/siteContentServer";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Perkhidmatan — Kabinet Dapur, Wardrobe & Lain-lain",
-  description: "Perkhidmatan reka bentuk & fabrikasi kabinet kustom KabinetCantik: dapur, wardrobe, TV cabinet, wall panelling di Klang Valley.",
+  description: "Perkhidmatan reka bentuk & fabrikasi kabinet kustom: dapur, wardrobe, TV cabinet, wall panelling.",
 };
 
-export default function PerkhidmatanPage() {
+export default async function PerkhidmatanPage() {
+  const { orgId } = await currentOrg();
+  const cfg = await loadServices(orgId);
   return (
     <section className="container-c pb-10 pt-28">
-      <p className="eyebrow">Perkhidmatan</p>
-      <h1 className="mt-2 h-display text-4xl">Apa yang kami reka</h1>
-      <p className="mt-3 max-w-xl text-ink/60">Setiap projek direka khas, difabrikasi di workshop sendiri, dan dipasang oleh pasukan kami.</p>
+      <p className="eyebrow">{cfg.eyebrow}</p>
+      <h1 className="mt-2 h-display text-4xl">{cfg.title}</h1>
+      <p className="mt-3 max-w-xl text-ink/60">{cfg.intro}</p>
 
       <div className="mt-10 space-y-6">
-        {SERVICES.map((s, i) => (
+        {cfg.items.map((s, i) => (
           <Link key={s.slug} href={`/perkhidmatan/${s.slug}`} className="group grid overflow-hidden rounded-2xl border border-ink/10 bg-white md:grid-cols-2">
             <div className={`relative aspect-[16/10] md:aspect-auto ${i % 2 ? "md:order-2" : ""}`}>
               <Image src={s.img} alt={s.nama} fill sizes="(max-width:768px) 100vw, 50vw" placeholder="blur" blurDataURL={BLUR} className="object-cover transition duration-500 group-hover:scale-105" />

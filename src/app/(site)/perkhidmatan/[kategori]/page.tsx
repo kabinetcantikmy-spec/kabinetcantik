@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { SERVICES } from "@/data/services";
 import { PortfolioCategory } from "@/data/portfolio";
 import { getPublishedProjects } from "@/lib/portfolioDb";
 import { currentOrg } from "@/lib/tenant";
+import { loadServices } from "@/lib/siteContentServer";
 import ProjectCard from "@/components/ProjectCard";
 import { BLUR } from "@/lib/img";
 
@@ -13,16 +13,19 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: { params: Promise<{ kategori: string }> }): Promise<Metadata> {
   const params = await props.params;
-  const s = SERVICES.find((x) => x.slug === params.kategori);
+  const { orgId } = await currentOrg();
+  const cfg = await loadServices(orgId);
+  const s = cfg.items.find((x) => x.slug === params.kategori);
   if (!s) return { title: "Perkhidmatan" };
-  return { title: `${s.nama} Kustom Klang Valley`, description: s.ringkas };
+  return { title: `${s.nama} Kustom`, description: s.ringkas };
 }
 
 export default async function ServiceCategory(props: { params: Promise<{ kategori: string }> }) {
   const params = await props.params;
-  const s = SERVICES.find((x) => x.slug === params.kategori);
-  if (!s) notFound();
   const { orgId, isDefault } = await currentOrg();
+  const cfg = await loadServices(orgId);
+  const s = cfg.items.find((x) => x.slug === params.kategori);
+  if (!s) notFound();
   const projects = (await getPublishedProjects(orgId, isDefault)).filter((p) => p.kategori === (s.slug as PortfolioCategory)).slice(0, 3);
 
   return (
@@ -31,7 +34,7 @@ export default async function ServiceCategory(props: { params: Promise<{ kategor
         <Image src={s.img} alt={s.nama} fill priority sizes="100vw" placeholder="blur" blurDataURL={BLUR} className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-ink/20" />
         <div className="container-c absolute inset-x-0 bottom-0 pb-8">
-          <p className="eyebrow text-brass-lite">Perkhidmatan</p>
+          <p className="eyebrow text-brass-lite">{cfg.eyebrow}</p>
           <h1 className="mt-2 font-display text-4xl font-semibold text-off-white">{s.nama}</h1>
         </div>
       </div>

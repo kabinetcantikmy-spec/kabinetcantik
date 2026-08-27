@@ -2,10 +2,13 @@ import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseS
 import { supabaseReady } from "@/lib/supabase";
 import { loadPricingConfig } from "@/lib/pricingServer";
 import { loadHomepageConfig } from "@/lib/homepageServer";
+import { loadServices, loadMaterials } from "@/lib/siteContentServer";
 import { tenantBrand } from "@/lib/branding";
 import SettingsEditor, { StaffUser } from "@/components/admin/SettingsEditor";
 import HomepageEditor from "@/components/admin/HomepageEditor";
 import BrandingEditor from "@/components/admin/BrandingEditor";
+import ServicesEditor from "@/components/admin/ServicesEditor";
+import MaterialsEditor from "@/components/admin/MaterialsEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +17,8 @@ export default async function TetapanPage() {
   const staff = await requireStaff();
   const config = await loadPricingConfig();
   const homepage = await loadHomepageConfig(null, staff.isPlatformAdmin);
+  const services = await loadServices(null);
+  const materials = await loadMaterials(null);
   const brand = await tenantBrand(staff.orgId);
   let users: StaffUser[] = [];
   let waEnabled = false;
@@ -32,6 +37,8 @@ export default async function TetapanPage() {
       <div className="mt-6 space-y-6">
         <BrandingEditor initial={{ nama: brand.nama, logoUrl: brand.logoUrl }} orgId={staff.orgId || ""} />
         <HomepageEditor initial={homepage} />
+        <ServicesEditor initial={services} />
+        <MaterialsEditor initial={materials} />
         <SettingsEditor config={config} users={users} waEnabled={waEnabled} />
       </div>
     </div>

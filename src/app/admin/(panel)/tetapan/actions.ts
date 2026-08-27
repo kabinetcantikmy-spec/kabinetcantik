@@ -4,6 +4,7 @@ import { createSupabaseServer, requireRole, requireStaff } from "@/lib/supabaseS
 import { PricingConfig } from "@/lib/pricing";
 import { planForOrg } from "@/lib/planServer";
 import { HomepageConfig } from "@/lib/homepage";
+import { ServicesConfig, MaterialsConfig } from "@/lib/siteContent";
 import { revalidatePath } from "next/cache";
 
 type Res = { ok: boolean; error?: string };
@@ -58,6 +59,28 @@ export async function saveHomepageConfig(config: HomepageConfig): Promise<Res> {
   revalidatePath("/admin/tetapan");
   revalidatePath("/");
   revalidatePath("/hubungi");
+  return { ok: true };
+}
+
+export async function saveServices(config: ServicesConfig): Promise<Res> {
+  await requireRole(["admin"]);
+  if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
+  const sb = createSupabaseServer();
+  const { error } = await sb.from("settings").upsert({ key: "services", value: config }, { onConflict: "org_id,key" });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/admin/tetapan");
+  revalidatePath("/perkhidmatan");
+  return { ok: true };
+}
+
+export async function saveMaterials(config: MaterialsConfig): Promise<Res> {
+  await requireRole(["admin"]);
+  if (!supabaseReady()) return { ok: false, error: "Supabase belum dikonfigurasi." };
+  const sb = createSupabaseServer();
+  const { error } = await sb.from("settings").upsert({ key: "materials", value: config }, { onConflict: "org_id,key" });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/admin/tetapan");
+  revalidatePath("/bahan");
   return { ok: true };
 }
 
