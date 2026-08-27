@@ -38,7 +38,7 @@ async function getStats() {
   const months: { key: string; label: string; count: number }[] = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString("ms-MY", { month: "short" }), count: 0 });
+    months.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString("ms-MY", { month: "short", timeZone: "Asia/Kuala_Lumpur" }), count: 0 });
   }
 
   for (const l of leads) {
