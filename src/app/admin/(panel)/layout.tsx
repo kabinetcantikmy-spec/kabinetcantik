@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { requireStaff } from "@/lib/supabaseServer";
 import { signOut } from "../auth-actions";
 import AdminNav from "@/components/admin/AdminNav";
@@ -6,11 +8,33 @@ import { planForOrg } from "@/lib/planServer";
 import { adminNavItems } from "@/lib/adminNav";
 import Logo from "@/components/Logo";
 import { tenantBrand } from "@/lib/branding";
+import { currentOrg } from "@/lib/tenant";
+import { createServiceClient, supabaseReady } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const staff = await requireStaff();
+
+  // Kunci admin ikut subdomain: tenant admin hanya boleh urus di subdomain
+  // syarikat sendiri. Kalau berada di root/subdomain tenant lain → alih ke
+  // subdomain sendiri. Platform admin dikecualikan (boleh akses mana-mana).
+  if (!staff.isPlatformAdmin && staff.orgId && supabaseReady()) {
+    const host = ((await headers()).get("host") || "").toLowerCase();
+    if (host.endsWith("kabinetcantik.com")) {
+      const { orgId: hostOrg } = await currentOrg();
+      if (hostOrg && hostOrg !== staff.orgId) {
+        const sb = createServiceClient();
+        const { data } = await sb.from("tenants").select("slug").eq("id", staff.orgId).maybeSingle();
+        const slug = ((data?.slug as string) || "").toLowerCase();
+        if (slug) {
+          const targetHost = slug === "kabinetcantik" ? "kabinetcantik.com" : `${slug}.kabinetcantik.com`;
+          if (host !== targetHost) redirect(`https://${targetHost}/admin`);
+        }
+      }
+    }
+  }
+
   const brand = await tenantBrand(staff.orgId);
   const { features, plan } = await planForOrg(staff.orgId);
   const navItems = adminNavItems(features, plan, staff.isPlatformAdmin);
