@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { marketingOff } from "@/lib/siteMode";
 import Hero from "@/components/Hero";
 import CategoryTiles from "@/components/CategoryTiles";
@@ -21,6 +22,10 @@ const TESTIMONIALS = [
 interface HomeReview { nama: string; rating: number; ulasan: string | null; avatar_url: string | null; projek_url: string | null }
 
 export default async function HomePage() {
+  // Subdomain app.kabinetcantik.com → laman SaaS (bukan laman consumer).
+  const host = ((await headers()).get("host") || "").toLowerCase().split(":")[0];
+  if (host.endsWith(".kabinetcantik.com") && host.split(".")[0] === "app") redirect("/os");
+
   if (await marketingOff()) redirect("/sebut-harga");
   const { orgId, isDefault } = await currentOrg();
   const hp = await loadHomepageConfig(orgId, isDefault);
