@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -13,6 +14,23 @@ import { currentOrg } from "@/lib/tenant";
 import { loadHomepageConfig } from "@/lib/homepageServer";
 
 export const dynamic = "force-dynamic";
+
+const APP_HOST_META: Metadata = {
+  title: { absolute: "KabinetCantik — Sistem untuk kontraktor kabinet" },
+  description:
+    "Urus lead, sebut harga, projek, website & portfolio dalam satu sistem. Dibina khas untuk pembuat kabinet & kontraktor.",
+  openGraph: {
+    title: "KabinetCantik — Sistem untuk kontraktor kabinet",
+    description: "Satu sistem untuk seluruh bisnes kabinet awak.",
+    type: "website",
+  },
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const host = ((await headers()).get("host") || "").toLowerCase().split(":")[0];
+  if (host.endsWith(".kabinetcantik.com") && host.split(".")[0] === "app") return APP_HOST_META;
+  return {};
+}
 
 const TESTIMONIALS = [
   { name: "Puan Aina", area: "Damansara", text: "Kabinet dapur kami nampak mewah tapi harga berpatutan. Pemasangan kemas & tepat masa." },
