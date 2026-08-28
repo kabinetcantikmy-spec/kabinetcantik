@@ -13,6 +13,13 @@ import JsonLd, { localBusinessLd } from "@/components/JsonLd";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const host = (await headers()).get("host");
+
+  // Subdomain app.kabinetcantik.com = laman SaaS — tiada header/footer consumer.
+  const h = (host || "").toLowerCase().split(":")[0];
+  if (h.endsWith(".kabinetcantik.com") && h.split(".")[0] === "app") {
+    return <>{children}</>;
+  }
+
   const brand = await hostBrand(host);
   const { orgId, isDefault } = await currentOrg();
   // Subdomain tak berdaftar → 404 (elak papar kandungan semua tenant).
