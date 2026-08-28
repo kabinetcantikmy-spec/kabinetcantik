@@ -1,3 +1,5 @@
+import ScrollReveal from "@/components/ScrollReveal";
+
 /* Laman SaaS (app.kabinetcantik.com) — dijana dari mockup; styles di-scope bawah .kcpro. */
 const CSS = `.kcpro *{margin:0;padding:0;box-sizing:border-box}.kcpro{
   --bg:#080B12;--bg2:#0B0F1A;--surf:#0F1524;--card:rgba(255,255,255,.035);--card2:rgba(255,255,255,.05);
@@ -19,7 +21,7 @@ section.blk{padding:88px 0;position:relative}.kcpro .shead{max-width:660px;margi
 .demo{position:relative;overflow:hidden;border:1px solid var(--lineB);border-radius:20px;padding:40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:linear-gradient(120deg,rgba(224,190,121,.08),var(--surf))}.kcpro .demo h3{font-family:var(--fd);font-size:27px;font-weight:600;color:#fff}.kcpro .demo p{color:var(--muted);font-size:15.5px;margin-top:6px}.kcpro /* faq */
 .faqs{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:12px}.kcpro .faq{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 22px}.kcpro .faq summary{cursor:pointer;font-family:var(--fd);font-size:16.5px;font-weight:600;color:#fff;padding:18px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}.kcpro .faq summary::-webkit-details-marker{display:none}.kcpro .faq summary::after{content:"+";color:var(--brass);font-size:22px;font-weight:400}.kcpro .faq[open] summary::after{content:"–"}.kcpro .faq p{padding:0 0 18px;font-size:14.5px;color:var(--muted);line-height:1.65}.kcpro /* final */
 .final{position:relative;overflow:hidden;text-align:center;border-top:1px solid var(--line)}.kcpro .final .orb{width:600px;height:400px;background:radial-gradient(circle,var(--glow),transparent 70%);top:-100px;left:50%;transform:translateX(-50%);opacity:.6}.kcpro .final h2{position:relative;font-family:var(--fd);font-weight:700;font-size:46px;letter-spacing:-1px;color:#fff}.kcpro .final p{position:relative;margin:16px auto 30px;font-size:17px;color:var(--muted);max-width:520px}.kcpro /* footer */
-footer{background:var(--bg2);border-top:1px solid var(--line);padding:54px 0 30px}.kcpro .foot-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;padding-bottom:30px;border-bottom:1px solid var(--line)}@media(max-width:760px){.kcpro .foot-top{grid-template-columns:1fr}}.kcpro .foot-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}.kcpro .foot-brand img{width:32px}.kcpro .foot-brand b{font-family:var(--fd);letter-spacing:1.5px;color:var(--text);font-size:14px}.kcpro .foot-desc{font-size:13.5px;color:var(--muted);max-width:320px}.kcpro footer h4{font-family:var(--fm);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--brass);margin-bottom:14px}.kcpro footer .fl{display:block;font-size:14px;color:var(--muted);margin-bottom:9px}.kcpro footer .fl:hover{color:var(--text)}.kcpro .foot-bar{padding-top:20px;font-family:var(--fm);font-size:11.5px;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;color:#5c6577}.kcpro{min-height:100vh}body{background:#080B12}`;
+footer{background:var(--bg2);border-top:1px solid var(--line);padding:54px 0 30px}.kcpro .foot-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;padding-bottom:30px;border-bottom:1px solid var(--line)}@media(max-width:760px){.kcpro .foot-top{grid-template-columns:1fr}}.kcpro .foot-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}.kcpro .foot-brand img{width:32px}.kcpro .foot-brand b{font-family:var(--fd);letter-spacing:1.5px;color:var(--text);font-size:14px}.kcpro .foot-desc{font-size:13.5px;color:var(--muted);max-width:320px}.kcpro footer h4{font-family:var(--fm);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--brass);margin-bottom:14px}.kcpro footer .fl{display:block;font-size:14px;color:var(--muted);margin-bottom:9px}.kcpro footer .fl:hover{color:var(--text)}.kcpro .foot-bar{padding-top:20px;font-family:var(--fm);font-size:11.5px;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;color:#5c6577}.kcpro{min-height:100vh}.kcpro.reveal-on .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}.kcpro.reveal-on .reveal.in{opacity:1;transform:none}@media(prefers-reduced-motion:reduce){.kcpro.reveal-on .reveal{opacity:1;transform:none;transition:none}}body{background:#080B12}`;
 const BODY = `<header><div class="wrap"><nav>
   <a class="logo" href="#"><img src="/logo-mark.png"><b>KABINET&nbsp;CANTIK</b></a>
   <div class="links"><a href="#ciri">Ciri</a><a href="#cara">Cara Guna</a><a href="#faq">Soalan</a></div>
@@ -29,7 +31,7 @@ const BODY = `<header><div class="wrap"><nav>
 <section class="hero">
   <div class="grid-bg"></div><div class="orb orb1"></div><div class="orb orb2"></div>
   <div class="wrap in">
-    <div>
+    <div class="reveal">
       <span class="chip">◆ Platform Kontraktor Kabinet</span>
       <h1>Satu sistem untuk<br>seluruh bisnes<br><span class="ac">kabinet awak.</span></h1>
       <p class="sub">Lead, sebut harga, projek, website &amp; portfolio — semua bersambung dalam satu dashboard. Berhenti bergelut dengan WhatsApp &amp; Excel.</p>
@@ -39,7 +41,7 @@ const BODY = `<header><div class="wrap"><nav>
       </div>
       <div class="trust"><span>Percuma sepenuhnya</span><span>Tanpa kad kredit</span><span>Siap 2 minit</span></div>
     </div>
-    <div class="mockwrap"><div class="win">
+    <div class="mockwrap reveal"><div class="win">
       <div class="chrome"><span class="cdot" style="background:#ff5f57"></span><span class="cdot" style="background:#febc2e"></span><span class="cdot" style="background:#28c840"></span><span class="addr">app.kabinetcantik.com/admin</span></div>
       <div class="app">
         <div class="side"><div class="brandrow"><img src="/logo-mark.png"><span>KABINET&nbsp;CANTIK</span></div><div class="nv on"><span class="ic">▦</span>Dashboard</div><div class="nv "><span class="ic">◎</span>Leads Pasaran</div><div class="nv "><span class="ic">▤</span>Pipeline</div><div class="nv "><span class="ic">₪</span>Sebut Harga</div><div class="nv "><span class="ic">▩</span>Projek</div><div class="nv "><span class="ic">❖</span>Portfolio</div></div>
@@ -61,36 +63,36 @@ const BODY = `<header><div class="wrap"><nav>
   </div>
 </section>
 
-<section class="statbar"><div class="wrap" style="padding:0"><div class="stats"><div class="stat"><div class="sv">6</div><div class="sl">Modul dalam 1 sistem</div></div><div class="stat"><div class="sv">2 min</div><div class="sl">Masa nak setup</div></div><div class="stat"><div class="sv">24/7</div><div class="sl">Akses di mana-mana</div></div><div class="stat"><div class="sv">100%</div><div class="sl">Data awak terasing</div></div></div></div></section>
+<section class="statbar"><div class="wrap" style="padding:0"><div class="stats"><div class="stat reveal"><div class="sv">6</div><div class="sl">Modul dalam 1 sistem</div></div><div class="stat reveal"><div class="sv">2 min</div><div class="sl">Masa nak setup</div></div><div class="stat reveal"><div class="sv">24/7</div><div class="sl">Akses di mana-mana</div></div><div class="stat reveal"><div class="sv">100%</div><div class="sl">Data awak terasing</div></div></div></div></section>
 
 <section class="blk">
   <div class="wrap">
-    <div class="shead"><span class="eyebrow">Masalah</span><h2>Bisnes kabinet awak bersepah kat merata tempat</h2></div>
+    <div class="shead reveal"><span class="eyebrow">Masalah</span><h2>Bisnes kabinet awak bersepah kat merata tempat</h2></div>
     <div class="problist">
-      <div class="pcard"><div class="x">✕</div><b>Lead hilang dalam WhatsApp</b><span>Chat bertimbun, lupa follow-up, prospek lari ke kontraktor lain.</span></div>
-      <div class="pcard"><div class="x">✕</div><b>Sebut harga lambat</b><span>Kira guna Excel setiap kali, customer tunggu lama, hilang mood.</span></div>
-      <div class="pcard"><div class="x">✕</div><b>Susah nak nampak pro</b><span>Takde website, takde portfolio kemas — customer ragu nak percaya.</span></div>
+      <div class="pcard reveal"><div class="x">✕</div><b>Lead hilang dalam WhatsApp</b><span>Chat bertimbun, lupa follow-up, prospek lari ke kontraktor lain.</span></div>
+      <div class="pcard reveal"><div class="x">✕</div><b>Sebut harga lambat</b><span>Kira guna Excel setiap kali, customer tunggu lama, hilang mood.</span></div>
+      <div class="pcard reveal"><div class="x">✕</div><b>Susah nak nampak pro</b><span>Takde website, takde portfolio kemas — customer ragu nak percaya.</span></div>
     </div>
   </div>
 </section>
 
 <section class="blk" id="ciri" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
   <div class="wrap">
-    <div class="shead"><span class="eyebrow">Modul</span><h2>Semua yang awak perlu, dalam satu tempat</h2><p>Dibina khas untuk pembuat kabinet &amp; kontraktor — bukan software generik.</p></div>
-    <div class="feats"><div class="ft"><span class="fic">◎</span><div class="fl">Leads Pasaran</div><div class="fd">Kami kongsi lead customer yang nak buat kabinet — awak claim yang berkenaan, terus masuk sistem. Anggap bonus atas usaha awak.</div></div><div class="ft"><span class="fic">▤</span><div class="fl">CRM &amp; Pipeline</div><div class="fd">Papan seret-lepas yang senang. Bagi tugas kat staff, set follow-up, rekod setiap panggilan — tak ada lead terlepas lagi.</div></div><div class="ft"><span class="fic">₪</span><div class="fl">Sebut Harga Auto</div><div class="fd">Borang pintar kat website awak — customer pilih kategori &amp; saiz, terus nampak julat harga. Awak dapat lead yang memang serius.</div></div><div class="ft"><span class="fic">❖</span><div class="fl">Website &amp; Portfolio</div><div class="fd">Website berjenama sendiri + galeri kerja. Customer tengok hasil kerja awak, terus mintak sebut harga kat situ juga.</div></div><div class="ft"><span class="fic">▩</span><div class="fl">Projek &amp; Laporan</div><div class="fd">Jejak setiap projek, upload gambar kerja, jana laporan PDF berjenama — hantar kat customer. Nampak kemas &amp; pro.</div></div><div class="ft"><span class="fic">▧</span><div class="fl">Analitik</div><div class="fd">Tengok statistik lead, nilai pipeline &amp; kadar tukar — tahu bisnes awak sihat ke tak, dalam satu pandangan.</div></div></div>
+    <div class="shead reveal"><span class="eyebrow">Modul</span><h2>Semua yang awak perlu, dalam satu tempat</h2><p>Dibina khas untuk pembuat kabinet &amp; kontraktor — bukan software generik.</p></div>
+    <div class="feats"><div class="ft reveal"><span class="fic">◎</span><div class="fl">Leads Pasaran</div><div class="fd">Kami kongsi lead customer yang nak buat kabinet — awak claim yang berkenaan, terus masuk sistem. Anggap bonus atas usaha awak.</div></div><div class="ft reveal"><span class="fic">▤</span><div class="fl">CRM &amp; Pipeline</div><div class="fd">Papan seret-lepas yang senang. Bagi tugas kat staff, set follow-up, rekod setiap panggilan — tak ada lead terlepas lagi.</div></div><div class="ft reveal"><span class="fic">₪</span><div class="fl">Sebut Harga Auto</div><div class="fd">Borang pintar kat website awak — customer pilih kategori &amp; saiz, terus nampak julat harga. Awak dapat lead yang memang serius.</div></div><div class="ft reveal"><span class="fic">❖</span><div class="fl">Website &amp; Portfolio</div><div class="fd">Website berjenama sendiri + galeri kerja. Customer tengok hasil kerja awak, terus mintak sebut harga kat situ juga.</div></div><div class="ft reveal"><span class="fic">▩</span><div class="fl">Projek &amp; Laporan</div><div class="fd">Jejak setiap projek, upload gambar kerja, jana laporan PDF berjenama — hantar kat customer. Nampak kemas &amp; pro.</div></div><div class="ft reveal"><span class="fic">▧</span><div class="fl">Analitik</div><div class="fd">Tengok statistik lead, nilai pipeline &amp; kadar tukar — tahu bisnes awak sihat ke tak, dalam satu pandangan.</div></div></div>
   </div>
 </section>
 
 <section class="blk" id="cara">
   <div class="wrap">
-    <div class="shead"><span class="eyebrow">Cara Guna</span><h2>Mula dalam 3 langkah</h2></div>
-    <div class="steps"><div class="step"><span class="snum">01</span><div class="st">Daftar percuma</div><div class="sd">Isi nama syarikat &amp; pilih alamat web awak. Ambil masa 2 minit je.</div></div><div class="step"><span class="snum">02</span><div class="st">Setup jenama</div><div class="sd">Letak logo &amp; maklumat syarikat. Website &amp; sistem awak terus siap sedia.</div></div><div class="step"><span class="snum">03</span><div class="st">Mula terima lead</div><div class="sd">Terima lead, buat sebut harga, urus projek — semua dari satu dashboard.</div></div></div>
+    <div class="shead reveal"><span class="eyebrow">Cara Guna</span><h2>Mula dalam 3 langkah</h2></div>
+    <div class="steps"><div class="step reveal"><span class="snum">01</span><div class="st">Daftar percuma</div><div class="sd">Isi nama syarikat &amp; pilih alamat web awak. Ambil masa 2 minit je.</div></div><div class="step reveal"><span class="snum">02</span><div class="st">Setup jenama</div><div class="sd">Letak logo &amp; maklumat syarikat. Website &amp; sistem awak terus siap sedia.</div></div><div class="step reveal"><span class="snum">03</span><div class="st">Mula terima lead</div><div class="sd">Terima lead, buat sebut harga, urus projek — semua dari satu dashboard.</div></div></div>
     <div style="text-align:center;margin-top:40px"><a class="btn btn-p" href="https://app.kabinetcantik.com/daftar">Daftar Percuma →</a></div>
   </div>
 </section>
 
 <section class="blk" id="cta-demo">
-  <div class="wrap"><div class="demo">
+  <div class="wrap"><div class="demo reveal">
     <div class="grid-bg" style="opacity:.5"></div>
     <div style="position:relative"><h3>Nak tengok dulu sebelum daftar?</h3><p>Cuba dashboard demo langsung — lead, projek, portfolio, semua ada.</p></div>
     <a class="btn btn-p" href="https://demokabinet.kabinetcantik.com" style="position:relative">Buka Demo →</a>
@@ -99,15 +101,15 @@ const BODY = `<header><div class="wrap"><nav>
 
 <section class="blk" id="faq">
   <div class="wrap">
-    <div class="shead"><span class="eyebrow">Soalan Lazim</span><h2>Ada soalan? Ni jawapannya</h2></div>
-    <div class="faqs"><details class="faq"><summary>Betul-betul percuma?</summary><p>Ya. Masa fasa pelancaran ni, semua ciri terbuka percuma — tanpa tarikh tamat, tanpa kad kredit. Yang daftar sekarang kekal keistimewaan awal bila harga diperkenalkan nanti.</p></details><details class="faq"><summary>Kena ada website sedia ada?</summary><p>Tak. Sebaik daftar, awak terus dapat website berjenama sendiri (alamat-awak.kabinetcantik.com) + galeri portfolio. Boleh guna terus.</p></details><details class="faq"><summary>Data pelanggan aku selamat?</summary><p>Ya. Setiap syarikat terasing sepenuhnya — data awak hanya awak yang nampak. Tenant lain tak boleh akses langsung.</p></details><details class="faq"><summary>Macam mana Leads Pasaran?</summary><p>Lead customer dari platform kami dikongsi sebagai bonus — awak pilih &amp; claim yang berkenaan. Ia tambahan; awak tetap bina bisnes sendiri.</p></details></div>
+    <div class="shead reveal"><span class="eyebrow">Soalan Lazim</span><h2>Ada soalan? Ni jawapannya</h2></div>
+    <div class="faqs"><details class="faq reveal"><summary>Betul-betul percuma?</summary><p>Ya. Masa fasa pelancaran ni, semua ciri terbuka percuma — tanpa tarikh tamat, tanpa kad kredit. Yang daftar sekarang kekal keistimewaan awal bila harga diperkenalkan nanti.</p></details><details class="faq reveal"><summary>Kena ada website sedia ada?</summary><p>Tak. Sebaik daftar, awak terus dapat website berjenama sendiri (alamat-awak.kabinetcantik.com) + galeri portfolio. Boleh guna terus.</p></details><details class="faq reveal"><summary>Data pelanggan aku selamat?</summary><p>Ya. Setiap syarikat terasing sepenuhnya — data awak hanya awak yang nampak. Tenant lain tak boleh akses langsung.</p></details><details class="faq reveal"><summary>Macam mana Leads Pasaran?</summary><p>Lead customer dari platform kami dikongsi sebagai bonus — awak pilih &amp; claim yang berkenaan. Ia tambahan; awak tetap bina bisnes sendiri.</p></details></div>
   </div>
 </section>
 
 <section class="blk final">
   <div class="orb"></div>
   <div class="wrap">
-    <h2>Sedia naik taraf bisnes kabinet awak?</h2>
+    <h2 class="reveal">Sedia naik taraf bisnes kabinet awak?</h2>
     <p>Daftar percuma hari ni. Siap dalam 2 minit, terus boleh guna.</p>
     <a class="btn btn-p" href="https://app.kabinetcantik.com/daftar">Daftar Percuma →</a>
   </div>
@@ -138,7 +140,9 @@ export default function AppLanding() {
         rel="stylesheet"
       />
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div className="kcpro" dangerouslySetInnerHTML={{ __html: BODY }} />
+      <noscript dangerouslySetInnerHTML={{ __html: "<style>.kcpro .reveal{opacity:1!important;transform:none!important}</style>" }} />
+      <div className="kcpro reveal-on" dangerouslySetInnerHTML={{ __html: BODY }} />
+      <ScrollReveal />
     </>
   );
 }
