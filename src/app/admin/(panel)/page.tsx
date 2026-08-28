@@ -77,7 +77,7 @@ export default async function Dashboard() {
 
   return (
     <div>
-      {!onboarding.done && (
+      {!staff.isPlatformAdmin && !onboarding.done && (
         <Link href="/admin/setup" className="mb-5 flex items-center justify-between gap-4 rounded-2xl border border-brass/40 bg-brass/5 px-5 py-4 transition hover:border-brass">
           <div>
             <div className="font-display text-lg font-semibold text-ink">Kemaskini maklumat anda</div>

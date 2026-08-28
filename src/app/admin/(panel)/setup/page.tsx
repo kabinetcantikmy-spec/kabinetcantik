@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/supabaseServer";
 import { tenantBrand } from "@/lib/branding";
 import { loadHomepageConfig } from "@/lib/homepageServer";
@@ -8,6 +9,8 @@ export const dynamic = "force-dynamic";
 
 export default async function SetupPage() {
   const staff = await requireStaff();
+  // KC platform bukan kedai — tiada flow setup untuk platform admin.
+  if (staff.isPlatformAdmin) redirect("/admin");
   const [business, onboarding, brand, homepage] = await Promise.all([
     loadBusiness(),
     loadOnboarding(),
